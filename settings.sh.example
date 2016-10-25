@@ -30,7 +30,7 @@
       settings_owner="<CHANGE_ME>"
 
   # AWS CLI parameters
-    settings_aws_cli_profile="$settings_project-$settings_environment"
+    settings_aws_cli_profile="$settings_environment-$settings_project"
     settings_region="<CHANGE_ME>"
 
     settings_tags_param1="Key=\"group\",Value=\"$settings_group\""
