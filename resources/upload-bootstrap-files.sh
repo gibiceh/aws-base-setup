@@ -1,18 +1,11 @@
 #!/bin/bash
 #:#########################################################################
-<<<<<<< HEAD
-#: Intent: Upload resource files to s3://$ENV-pim-resources
-#:
-#: Dependencies:
-#:    - s3://$ENV-pim-resources exists
-#:##########################################################################
-
-=======
 #: Intent: Upload resource files to s3://$settings_prelim_s3repos_resources_bucketname
 #:    - ec2 bootstrap scripts
 #:    - custom resources to extend cloudformation with lambda functions
 #:
 #: Dependencies:
+#:	 - aws cli installed and configured
 #:    - s3://$settings_prelim_s3repos_resources_bucketname exists
 #:##########################################################################
 

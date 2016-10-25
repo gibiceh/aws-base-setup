@@ -17,7 +17,8 @@
     },
     "keepAliveTag":{
       "Type": "String",
-      "Description":"tag - keep alive tag"
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
     },
     "ownerTag":{
       "Type": "String",
@@ -52,7 +53,7 @@
       "Type":"String",
       "Description": "The name of the S3 bucket that holds project resource files"
     },
-    "snsTopicName": {
+    "snsTopic": {
       "Description": "Name for the sns topic receiving alarm notifications",
       "Type": "String"
     },
@@ -75,6 +76,9 @@
   "Resources": {
     "cloudTrailSetup": {
 			"Type":"AWS::CloudFormation::Stack",
+      "Metadata":{
+        "Comment" : "Provision cloudtrail for the account (with s3 bucket) and set up cloudwatch billing alarms"
+      },
       "Condition" : "createCloudTrail",
 			"Properties" :{
 				"Parameters" :{
@@ -94,135 +98,63 @@
       "DependsOn" : "setupSns"
     },
 
-<<<<<<< HEAD
-=======
     "iamSetup": {
 			"Type":"AWS::CloudFormation::Stack",
+      "Metadata": {
+        "Comment":"Provision iam groups, policies, roles, and users.",
+        "Comment2":"Needed by lambda."
+      },
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
+          "costCenterTag": {"Ref" : "costCenterTag"},
           "environmentTag": {"Ref" : "environmentTag"},
+          "groupTag": {"Ref" : "groupTag"},
 					"keepAliveTag": {"Ref" : "keepAliveTag"},
 					"ownerTag": {"Ref" : "ownerTag"},
-          "snsAlarmNotificationsTopicName": {"Ref" : "snsAlarmNotificationsTopicName"},
-          "lambdaCustomResourceGeneratorArn": { "Fn::GetAtt" : ["lambdaCustomResourceGenerator", "Arn"] },
-          "iamGroupAdministrator": {"Ref" : "iamGroupAdministrator"},
-          "iamGroupForceMfa": {"Ref" : "iamGroupForceMfa"},
-          "iamGroupPowerUsers": {"Ref" : "iamGroupPowerUsers"}
+          "projectTag": {"Ref" : "projectTag"},
+          "stackNameTag": {"Ref" : "stackNameTag"}
 				},
 				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/iam-setup.json"]]}
-      },
-			"DependsOn" : "lambdaCustomResourceGenerator"
+      }
     },
 
     "lambdaFunctions":{
 			"Type":"AWS::CloudFormation::Stack",
+      "Metadata":{
+        "Comment":"Create lambda function needed for latest amazon ami info lookup"
+      },
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
+          "costCenterTag": {"Ref" : "costCenterTag"},
+          "environmentTag": {"Ref" : "environmentTag"},
+          "groupTag": {"Ref" : "groupTag"},
 					"keepAliveTag": {"Ref" : "keepAliveTag"},
 					"ownerTag": {"Ref" : "ownerTag"},
+          "projectTag": {"Ref" : "projectTag"},
+          "stackNameTag": {"Ref" : "stackNameTag"},
 					"resourcesBucketName": {"Ref" : "resourcesBucketName"},
-					"amiLookupIAMRoleArn": { "Fn::GetAtt" : [ "iamSetup", "Outputs.lambdaAMILookupExecutionRoleArn" ] }
+					"latestAmazonAmiInfoExecutionRoleArn": { "Fn::GetAtt" : [ "iamSetup", "Outputs.latestAmazonAmiInfoExecutionRoleArn" ] }
 				},
 				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/lambda-functions.json"]]}
 			},
 			"DependsOn" : "iamSetup"
 		},
 
-    "lambdaCustomResourceGenerator": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "FunctionName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "manageCustomResources"]]},
-        "Code": {
-          "S3Bucket": { "Ref": "resourcesBucketName" },
-          "S3Key": "custom-resources.zip"
-        },
-        "Handler": "index.handler",
-        "Role": { "Fn::GetAtt" : ["lambdaCustomResourcesIAMRole", "Arn"] },
-        "Runtime": "nodejs",
-        "Timeout": "30"
-      },
-			"DependsOn" : "lambdaCustomResourcesIAMRole"
-    },
-
-    "lambdaCustomResourcesIAMRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-           "Version" : "2012-10-17",
-           "Statement": [ {
-              "Effect": "Allow",
-              "Principal": {
-                 "Service": [ "lambda.amazonaws.com" ]
-              },
-              "Action": [ "sts:AssumeRole" ]
-           } ]
-        },
-        "Path": "/",
-        "Policies": [ {
-          "PolicyName": {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "lambdaCustomResourcesIAMRole"]]},
-          "PolicyDocument": {
-            "Version" : "2012-10-17",
-            "Statement": [
-              {
-                "Sid": "1",
-                "Effect": "Allow",
-                "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents"
-                ],
-                "Resource": "arn:aws:logs:*:*:*"
-              },
-              {
-                "Sid": "2",
-                "Effect": "Allow",
-                "Action": [
-                  "iam:AddUserToGroup",
-                  "iam:CreateRole",
-                  "iam:CreateGroup",
-                  "iam:CreateUser",
-                  "iam:DeleteGroup",
-                  "iam:DeleteRole",
-                  "iam:DeleteUser",
-                  "kinesis:CreateStream",
-                  "kinesis:DeleteStream",
-                  "kms:Create*",
-                  "kms:Delete*",
-                  "kms:Disable*",
-                  "kms:Enable*",
-                  "kms:Get*",
-                  "kms:List*",
-                  "kms:Update*"
-                ],
-                "Resource": "*"
-              }
-            ]
-          }
-        } ]
-      }
-    },
-
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
     "setupSns" : {
       "Type":"AWS::CloudFormation::Stack",
+      "Metadata":{
+        "Comment":"Provision SNS topic for alarm/monitoring notifications."
+      },
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-<<<<<<< HEAD
-					"costCenterTag": {"Ref" : "costCenterTag"},
+          "costCenterTag": {"Ref" : "costCenterTag"},
           "environmentTag": {"Ref" : "environmentTag"},
+          "groupTag": {"Ref" : "groupTag"},
 					"keepAliveTag": {"Ref" : "keepAliveTag"},
 					"ownerTag": {"Ref" : "ownerTag"},
-          "snsTopicName" : {"Ref" : "snsTopicName"},
+          "projectTag": {"Ref" : "projectTag"},
+          "stackNameTag": {"Ref" : "stackNameTag"},
+          "snsTopic" : {"Ref" : "snsTopic"},
           "snsTopicEmailSubscription" : {"Ref" : "snsTopicEmailSubscription"}
 				},
         "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/setup-sns.json"]]}
@@ -231,28 +163,10 @@
   },
 
   "Outputs" : {
-=======
-          "environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-          "snsAlarmNotificationsTopicName" : {"Ref" : "snsAlarmNotificationsTopicName"},
-          "snsAlarmNotificationsTopicEmailSubscription" : {"Ref" : "snsAlarmNotificationsTopicEmailSubscription"}
-				},
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/setup-sns.json"]]}
-		  },
-      "DependsOn" : ["iamSetup"]
-    }
-  },
-  "Outputs" : {
-    "lambdaCustomResourceGeneratorArn":{
-			"Description" : "The arn of the lambdaCustomResourceGenerator function",
-    	"Value" : { "Fn::GetAtt" : ["lambdaCustomResourceGenerator", "Arn"] }
-		},
     "amiInfoFunctionArn":{
-			"Description" : "The arn of the amiInfoLambdaFunction function",
+			"Description" : "The arn of the latestAmazonAmiInfoLambdaFunction function",
     	"Value" : { "Fn::GetAtt" : ["lambdaFunctions", "Outputs.amiInfoFunctionArn"] }
 		},
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
     "snsTopicArn":{
 			"Description" : "The arn of the SNS Topic for monitoring/alarm notifications",
     	"Value" : { "Fn::GetAtt" : ["setupSns", "Outputs.snsTopicArn"] }

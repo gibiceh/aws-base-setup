@@ -60,6 +60,11 @@
 
 #: setup-preliminaries.sh
 #:##########################################################################
+#: Define IAM password policy parameters
+  settings_prelim_iam_min_pw_length="8"
+  settings_prelim_iam_max_pw_age="60" # days
+  settings_prelim_iam_pw_reuse_prevention="4" # cannot use the previous x passwords
+
 #: Define stack settings/parameters for preliminaries/s3-repos
   settings_prelim_s3repos_stack_name="$settings_environment-$settings_project-preliminaries-s3repos"
   settings_prelim_s3repos_master_template="s3-repos.json"
@@ -67,13 +72,13 @@
   settings_prelim_s3repos_cftemplates_bucketname="$settings_environment-$settings_project-cf-templates"
   settings_prelim_s3repos_resources_bucketname="$settings_environment-$settings_project-resources"
 
-  settings_prelim_s3repos_param1="ParameterKey=stackName,ParameterValue=$settings_prelim_s3repos_stack_name"
-  settings_prelim_s3repos_param2="ParameterKey=projectTag,ParameterValue=$settings_project"
+  settings_prelim_s3repos_param1="ParameterKey=costCenterTag,ParameterValue=$settings_cost_center"
+  settings_prelim_s3repos_param2="ParameterKey=environmentTag,ParameterValue=$settings_environment"
   settings_prelim_s3repos_param3="ParameterKey=groupTag,ParameterValue=$settings_group"
-  settings_prelim_s3repos_param4="ParameterKey=costCenterTag,ParameterValue=$settings_cost_center"
-  settings_prelim_s3repos_param5="ParameterKey=environmentTag,ParameterValue=$settings_environment"
-  settings_prelim_s3repos_param6="ParameterKey=keepAliveTag,ParameterValue=$settings_keep_alive"
-  settings_prelim_s3repos_param7="ParameterKey=ownerTag,ParameterValue=$settings_owner"
+  settings_prelim_s3repos_param4="ParameterKey=keepAliveTag,ParameterValue=$settings_keep_alive"
+  settings_prelim_s3repos_param5="ParameterKey=ownerTag,ParameterValue=$settings_owner"
+  settings_prelim_s3repos_param6="ParameterKey=projectTag,ParameterValue=$settings_project"
+  settings_prelim_s3repos_param7="ParameterKey=stackNameTag,ParameterValue=$settings_prelim_s3repos_stack_name"
   settings_prelim_s3repos_param8="ParameterKey=cfTemplateBucketName,ParameterValue=$settings_prelim_s3repos_cftemplates_bucketname"
   settings_prelim_s3repos_param9="ParameterKey=resourcesBucketName,ParameterValue=$settings_prelim_s3repos_resources_bucketname"
 
@@ -114,7 +119,7 @@
     settings_prelim_param10="ParameterKey=cloudTrailS3BucketName,ParameterValue=$settings_cloudtrail_s3_bucket_name"
     settings_prelim_param11="ParameterKey=cfTemplateBucketName,ParameterValue=$settings_prelim_s3repos_cftemplates_bucketname"
     settings_prelim_param12="ParameterKey=resourcesBucketName,ParameterValue=$settings_prelim_s3repos_resources_bucketname"
-    settings_prelim_param13="ParameterKey=snsTopicName,ParameterValue=$settings_alarm_notification_sns_topic"
+    settings_prelim_param13="ParameterKey=snsTopic,ParameterValue=$settings_alarm_notification_sns_topic"
     settings_prelim_param14="ParameterKey=snsTopicEmailSubscription,ParameterValue=$settings_alarm_notification_sns_topic_email"
 
     settings_prelim_params=$(printf "%s %s %s %s %s %s %s %s %s %s %s %s %s %s" \

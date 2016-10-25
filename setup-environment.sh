@@ -5,6 +5,7 @@
 #:  of the environment
 #:
 #: Requires:
+#:	- aws cli installed and configured
 #:  - ENV needs to be set in shell.  example:  export ENV=dev
 #: 	- settings.sh
 #:		- contains parameters (bucket names, stack name, tags, etc)
@@ -60,7 +61,6 @@ function main() {
     setup-vpc
   elif [ "$1" == "all" ]; then
     setup-preliminaries
-    update-resources-bucket
     setup-vpc
   elif [ "$1" == "update-resources-bucket" ]; then
     update-resources-bucket

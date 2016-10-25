@@ -1,27 +1,24 @@
 #!/bin/bash
 #:#########################################################################
-#: Intent: This script creates a CF stack that will provision the following
-<<<<<<< HEAD
-#:            for the pim environment:
-=======
-#:            for the environment:
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+#: Intent: This script creates a CF stack that will provision the following resources
 #:              - SNS topic
 #:                  - needed for alerts
 #:              - S3 buckets
-#:              - IAM groups, users, policies
+#:              - IAM groups, users, policies (not all are currently provisioned)
 #:        This script will execute resources/upload-bootstrap-files.sh to upload
-#:          Resource files needed for lambda functions, ec2 bootstraping, api gateway, etc.
+#:          resource files needed for lambda functions, ec2 bootstraping, api gateway, etc.
 #:
 #: Notes:
-#:	The s3 bucket name cannot already exist prior to running this script.
-#: 	settings.sh
+#:	- aws cli installed and configured
+#:	- The s3 bucket name cannot already exist prior to running this script.
+#: 	- settings.sh
 #:		- contains parameters (bucket names, stack name, tags, etc)
 #:			used in the Cloudformation create-stack call)
-#:	utilities.sh (contains helper functions)
+#:	- utilities.sh (contains helper functions)
 #:
 #:##########################################################################
 
+# Purpose:
 # check to see if iam password policy has already been created
 function check_iam_password_policy() {
   local exit_code="0"
@@ -38,6 +35,15 @@ function check_iam_password_policy() {
   fi
 }
 
+# Purpose:
+# setup an iam password policy on the aws account if missing
+# Parameters:
+# $1: minimum password length
+# $2: maximum password age (in days) before reset neeeded
+# $3: minimum number of iterations before you can reuse a previous password
+#
+# Usage:
+# setup_iam_password_policy "8" "60" "4"
 function setup_iam_password_policy() {
   check_iam_password_policy
 
@@ -48,14 +54,14 @@ function setup_iam_password_policy() {
 
     aws --profile $settings_aws_cli_profile \
       iam update-account-password-policy \
-      --minimum-password-length 8 \
+      --minimum-password-length $1 \
       --require-uppercase-characters \
       --require-lowercase-characters \
       --require-numbers \
       --require-symbols \
       --allow-users-to-change-password \
-      --max-password-age 60 \
-      --password-reuse-prevention 4
+      --max-password-age $2 \
+      --password-reuse-prevention $3
 
     log_msg "SUCCESS:  iam password policy created"
   fi
@@ -66,17 +72,13 @@ function main() {
   source "$CURRENT_DIR/../settings.sh"
   source "$CURRENT_DIR/../utilities.sh"
 
-<<<<<<< HEAD
-  # via cli - provision IAM password policy, Heroku group/user for access to AWS, admin/developer access on AWS
-  setup_iam_password_policy
-
-  # provision cloudformation stack to create s3 buckets for template uploads and conductor resources
-=======
   # via cli - provision IAM password policy
-  setup_iam_password_policy
+  setup_iam_password_policy \
+    $settings_prelim_iam_min_pw_length \
+    $settings_prelim_iam_max_pw_age \
+    $settings_prelim_iam_pw_reuse_prevention
 
   # provision cloudformation stack to create s3 buckets for cloudformation template files and environment resources
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
   log_msg "START:  create cloudformation stack - $settings_prelim_s3repos_stack_name"
   setup_stack \
     $settings_prelim_s3repos_stack_name \
@@ -90,11 +92,7 @@ function main() {
   # Upload Resource files needed for lambda functions, ec2 bootstraping, api gateway, etc.
   sh $CURRENT_DIR/../resources/upload-bootstrap-files.sh
 
-<<<<<<< HEAD
-  # Provision SNS Billing Alarm Topic, CloudTrail for the account, IAM Policies for Heroku Group, Administrators, Force_MFA, and ConductorPowerUsers
-=======
-  # Provision SNS Billing Alarm Topic, CloudTrail for the account, IAM Policies for Administrators, Force_MFA, and PowerUsers
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+  # Provision sns alarm notification topic, optional cloudtrail for the account, lambda functions for latest ami lookup
   log_msg "START:  create cloudformation stack - $settings_prelim_stack_name"
   setup_stack \
     $settings_prelim_stack_name \

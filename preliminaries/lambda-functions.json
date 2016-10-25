@@ -4,45 +4,51 @@
   "Description" : "Create lambda function needed for latest amazon ami info lookup",
 
   "Parameters" : {
+    "costCenterTag":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "environmentTag":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "groupTag":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "keepAliveTag":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "ownerTag":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "projectTag":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
     "stackNameTag":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"projectTag":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"groupTag":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"environmentTag":{
-			"Type": "String",
-			"Description": "Tag - Environment"
-		},
-		"keepAliveTag":{
-			"Type": "String",
-			"Description":"Tag - Keep Alive tag"
-		},
-		"ownerTag":{
-			"Type": "String",
-			"Description":"Tag - product owner"
-		},
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
     "resourcesBucketName" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
-    "amiLookupIAMRoleArn" : {
+    "latestAmazonAmiInfoExecutionRoleArn" : {
       "Description" : "The arn for the IAM role used by lambda to lookup the latest Amazon Linux AMI",
       "Type" : "String"
     },
     "moduleName" : {
-      "Description" : "The name of the JavaScript file for looking up the latest AMI ID",
+      "Description" : "The name of the JavaScript file for looking up the latest Amazon Linux AMI ID",
       "Type" : "String",
       "Default" : "amilookup"
     },
     "s3Key" : {
-      "Description" : "The name of the ZIP package for looking up the latest AMI ID",
+      "Description" : "The name of the ZIP package for looking up the latest Amazon Linux AMI ID",
       "Type" : "String",
       "Default" : "amilookup.zip"
     },
@@ -57,27 +63,30 @@
     "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
   },
 
-
   "Resources" : {
-    "amiInfoLambdaFunction": {
+    "latestAmazonAmiInfoLambdaFunction": {
       "Type": "AWS::Lambda::Function",
+      "Metadata":{
+        "Comment":"Retrieves the latest Amazon Linux AMI ID"
+      },
       "Properties": {
-        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "environmentTag" },{ "Ref": "projectTag" },"amiInfoLambdaFunction"] ] },
+        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "environmentTag" },{ "Ref": "projectTag" },"latestAmazonAmiInfoLambdaFunction"] ] },
         "Code": {
           "S3Bucket": { "Ref": "resourcesBucketName" },
           "S3Key": { "Ref": "s3Key" }
         },
         "Handler": { "Fn::Join" : [ "", [{ "Ref": "moduleName" },".handler"] ] },
-        "Role": {"Ref" : "amiLookupIAMRoleArn"},
+        "Role": {"Ref" : "latestAmazonAmiInfoExecutionRoleArn"},
         "Runtime": "nodejs",
         "Timeout": "30"
       }
     }
   },
+  
   "Outputs" : {
     "amiInfoFunctionArn":{
-			"Description" : "The arn of the lambda function",
-    	"Value" : { "Fn::GetAtt" : ["amiInfoLambdaFunction", "Arn"] }
+			"Description" : "The arn of the lambda function that retrieves the latest Amazon Linux AMI ID",
+    	"Value" : { "Fn::GetAtt" : ["latestAmazonAmiInfoLambdaFunction", "Arn"] }
 		}
   }
 }

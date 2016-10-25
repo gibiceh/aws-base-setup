@@ -6,6 +6,7 @@
 #:	- check status of stack creation
 #:
 #: Requires:
+#:	- aws cli installed and configured
 #:	- jq
 #:	- settings.sh
 #:
