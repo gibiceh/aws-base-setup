@@ -4,5 +4,6 @@ logs/automation.log
 resources/*/*.tar
 resources/amilookup.zip
 resources/aws-slack-notify.zip
+resources/sed_monsanto_tags.sh
 settings.sh
 temp
