@@ -90,7 +90,7 @@
               "Action": ["sts:AssumeRole"]
           }]
         },
-        "ManagedPolicyArns": [ {"Ref": "crossStackLookupManagedPolicy"}],
+        "ManagedPolicyArns": [ {"Ref": "latestAmazonAmiLookupExecutionPolicy"}],
         "Path": "/"
       },
       "DependsOn":"latestAmazonAmiLookupExecutionPolicy"
