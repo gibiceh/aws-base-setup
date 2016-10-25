@@ -2,31 +2,31 @@
 	"AWSTemplateFormatVersion" : "2010-09-09",
 	"Description" : "Creates all route tables for the Conductor infrastructure and associates them with the appropriate subnets.",
 	"Parameters" : {
-		"stackNameTag":{
+		"tagStack":{
 			"Type": "String",
 			"Description":"tag - stack name"
 	  },
-		"projectTag":{
+		"tagProject":{
 			"Type": "String",
 			"Description":"tag - project name"
 		},
-		"groupTag":{
+		"tagGroup":{
 			"Type": "String",
 			"Description":"tag - group name"
 		},
-		"costCenterTag":{
+		"tagCostCenter":{
 			"Type": "String",
 			"Description":"tag - cost center"
 		},
-		"environmentTag":{
+		"tagEnvironment":{
 			"Type": "String",
 			"Description":"tag - environment"
 		},
-		"keepAliveTag":{
+		"tagKeepAlive":{
 			"Type": "String",
 			"Description":"tag - keep alive tag"
 		},
-		"ownerTag":{
+		"tagOwner":{
 			"Type": "String",
 			"Description":"tag - product owner"
 		},
@@ -72,28 +72,28 @@
 				"VpcId": {"Ref" : "vpcId"},
 				"Tags": [{
 					"Key":"stack",
-					"Value": {"Ref": "stackNameTag"}
+					"Value": {"Ref": "tagStack"}
 					},{
 	        "Key":"Name",
-	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"publicRouteTable"]]}
+	        "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicRouteTable"]]}
 	        },{
 					"Key":"project",
-	        "Value":{"Ref": "projectTag"}
+	        "Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"cost-center",
-	      	"Value":{"Ref": "costCenterTag"}
+	      	"Value":{"Ref": "tagCostCenter"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
 			},
@@ -128,28 +128,28 @@
 				"VpcId": {"Ref" : "vpcId"},
 				"Tags": [{
 					"Key":"stack",
-					"Value": {"Ref": "stackNameTag"}
+					"Value": {"Ref": "tagStack"}
 					},{
 	        "Key":"Name",
-	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"internalRouteTable"]]}
+	        "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"internalRouteTable"]]}
 	        },{
 					"Key":"project",
-	        "Value":{"Ref": "projectTag"}
+	        "Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"cost-center",
-	        "Value":{"Ref": "costCenterTag"}
+	        "Value":{"Ref": "tagCostCenter"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
 			},

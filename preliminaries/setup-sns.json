@@ -2,33 +2,33 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Provision SNS topic for alarm/monitoring notifications",
   "Parameters": {
-    "costCenterTag":{
+    "tagCostCenter":{
       "Type": "String",
       "Description":"tag - cost center"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment",
       "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - group name"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag",
       "AllowedValues" : ["true", "false"]
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - project name"
     },
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },

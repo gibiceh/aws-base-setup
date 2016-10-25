@@ -6,50 +6,50 @@
 	"Description" : "Creates the VPC endpoints for EC2 to s3://$settings_environment-$settings_project-resources access and package repository calls from amazon linux",
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 	"Parameters" : {
-		"stackNameTag":{
+		"tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-	  "projectTag":{
+	  "tagProject":{
 	    "Type": "String",
 <<<<<<< HEAD
 	    "Description":"tag - project name"
 	  },
-	  "groupTag":{
+	  "tagGroup":{
 	    "Type": "String",
 	    "Description":"tag - group name"
 	  },
-	  "costCenterTag":{
+	  "tagCostCenter":{
 	    "Type": "String",
 	    "Description":"tag - cost center"
 	  },
-		"environmentTag":{
+		"tagEnvironment":{
 	    "Type": "String",
 	    "Description":"tag - environment"
 	  },
-	  "keepAliveTag":{
+	  "tagKeepAlive":{
 	    "Type": "String",
 	    "Description":"tag - keep alive tag"
 	  },
-	  "ownerTag":{
+	  "tagOwner":{
 	    "Type": "String",
 	    "Description":"tag - product owner"
 =======
 	    "Description":"Tag - Project name"
 	  },
-	  "groupTag":{
+	  "tagGroup":{
 	    "Type": "String",
 	    "Description":"Tag - Group name"
 	  },
-		"environmentTag":{
+		"tagEnvironment":{
 	    "Type": "String",
 	    "Description":"environment tag"
 	  },
-	  "keepAliveTag":{
+	  "tagKeepAlive":{
 	    "Type": "String",
 	    "Description":"Tag - Keep Alive tag"
 	  },
-	  "ownerTag":{
+	  "tagOwner":{
 	    "Type": "String",
 	    "Description":"Tag - product owner"
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
@@ -66,7 +66,7 @@
 	  	"Type":"String",
 	  	"Description":"The ID of the public route table the public subnet is associated with."
 	  },
-		"resourcesBucketName":{
+		"bucketResources":{
 			"Type":"String",
 			"Description": "The name of the S3 bucket that holds resource files for conductor"
 		}

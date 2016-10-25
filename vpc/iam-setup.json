@@ -2,35 +2,35 @@
    "AWSTemplateFormatVersion": "2010-09-09",
    "Description" : "This stack creates the needed IAM roles for EC2 to S3 access for the ec2 boxes",
    "Parameters" : {
-     "stackNameTag":{
+     "tagStack":{
        "Type": "String",
        "Description":"tag - stack name"
        },
-       "projectTag":{
+       "tagProject":{
          "Type": "String",
          "Description":"tag - project name"
        },
-       "groupTag":{
+       "tagGroup":{
          "Type": "String",
          "Description":"tag - group name"
        },
-       "costCenterTag":{
+       "tagCostCenter":{
          "Type": "String",
          "Description":"tag - cost center"
        },
-       "environmentTag":{
+       "tagEnvironment":{
          "Type": "String",
          "Description":"tag - environment"
        },
-       "keepAliveTag":{
+       "tagKeepAlive":{
          "Type": "String",
          "Description":"tag - keep alive tag"
        },
-       "ownerTag":{
+       "tagOwner":{
          "Type": "String",
          "Description":"tag - product owner"
        },
- 			 "resourcesBucketName":{
+ 			 "bucketResources":{
  	    	 "Type":"String",
  	    	 "Description": "The name of the S3 bucket that holds resource files for conductor"
  	     },
@@ -86,7 +86,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -95,7 +95,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}, "/app-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/app-server/*"]]}
               }
             ]
           }
@@ -130,27 +130,27 @@
             "Statement": [{
 =======
      },
-     "projectTag":{
+     "tagProject":{
        "Type": "String",
        "Description":"Tag - Project name"
      },
-     "groupTag":{
+     "tagGroup":{
        "Type": "String",
        "Description":"Tag - Group name"
      },
-     "environmentTag":{
+     "tagEnvironment":{
        "Type": "String",
        "Description":"environment tag"
      },
-     "keepAliveTag":{
+     "tagKeepAlive":{
        "Type": "String",
        "Description":"Tag - Keep Alive tag"
      },
-     "ownerTag":{
+     "tagOwner":{
        "Type": "String",
        "Description":"Tag - product owner"
      },
- 		 "resourcesBucketName":{
+ 		 "bucketResources":{
  	  	 "Type":"String",
  	  	 "Description": "The name of the S3 bucket that holds resource files for conductor"
  	   },
@@ -212,7 +212,7 @@
                   "s3:GetBucketLocation",
                   "s3:GetObject"
               ],
-              "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}, "/*"]]}
+              "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/*"]]}
             },
             {
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
@@ -293,7 +293,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -302,7 +302,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}, "/db-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/db-server/*"]]}
               }
             ]
           }
@@ -357,7 +357,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -366,7 +366,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}, "/file-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/file-server/*"]]}
               }
             ]
           }
@@ -421,7 +421,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -430,7 +430,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "resourcesBucketName"}, "/rd-gateway/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/rd-gateway/*"]]}
               }
             ]
           }

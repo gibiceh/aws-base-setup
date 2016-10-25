@@ -2,31 +2,31 @@
 	"AWSTemplateFormatVersion" : "2010-09-09",
 	"Description" : "This stack creates network security controls. Subnet partitions and ACLs. Routes.",
 	"Parameters" : {
-		"stackNameTag":{
+		"tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-		"projectTag":{
+		"tagProject":{
 			"Type": "String",
 			"Description":"tag - stack name"
 		},
-		"groupTag":{
+		"tagGroup":{
 			"Type": "String",
 			"Description":"tag - stack name"
 		},
-		"environmentTag":{
+		"tagEnvironment":{
 			"Type": "String",
 			"Description":"environment tag"
 		},
-		"keepAliveTag":{
+		"tagKeepAlive":{
 			"Type": "String",
 			"Description":"Tag - Keep Alive tag"
 		},
-		"ownerTag":{
+		"tagOwner":{
 			"Type": "String",
 			"Description":"Tag - product owner"
 		},
-		"cfTemplateBucketName":{
+		"bucketCfTemplates":{
 			"Type":"String",
 			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
 		},
@@ -78,25 +78,25 @@
 	  		"VpcId": {"Ref" : "vpcId"},
 		    "Tags":[{
 		      "Key":"stack",
-		      "Value": {"Ref": "stackNameTag"}
+		      "Value": {"Ref": "tagStack"}
 		      },{
 	        "Key":"Name",
-	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"publicSubnet"]]}
+	        "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicSubnet"]]}
 	        },{
 					"Key":"project",
-	        "Value":{"Ref": "projectTag"}
+	        "Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
 	    },
@@ -113,25 +113,25 @@
 		    "VpcId": {"Ref" : "vpcId"},
 		    "Tags":[{
 		      "Key":"stack",
-		      "Value": {"Ref": "stackNameTag"}
+		      "Value": {"Ref": "tagStack"}
 		      },{
 	      	"Key":"Name",
-	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"privateSubnet"]]}
+	      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"privateSubnet"]]}
 	        },{
 					"Key":"project",
-	      	"Value":{"Ref": "projectTag"}
+	      	"Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
 		  },
@@ -144,19 +144,19 @@
 	  	"Type":"AWS::CloudFormation::Stack",
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"vpcCidr": { "Ref":"vpcCidr" },
 					"vpcId": { "Ref":"vpcId" },
 					"publicSubnetId": { "Ref":"publicSubnet" },
 					"privateSubnetId": { "Ref":"privateSubnet" },
 					"gatewayId": {"Ref" : "internetGatewayId"}
 				},
-			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/routetables.json"]]}
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/routetables.json"]]}
 			},
 			"DependsOn" : ["publicSubnet", "privateSubnet"]
 	  },
@@ -165,17 +165,17 @@
 	  	"Type":"AWS::CloudFormation::Stack",
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"vpcId": { "Ref":"vpcId" },
 					"publicSubnetId": { "Ref":"publicSubnet" },
 					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"}
 				},
-			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/publicsubnet-acls.json"]]}
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/publicsubnet-acls.json"]]}
 			},
 			"DependsOn" : "publicSubnet"
 	  },
@@ -184,19 +184,19 @@
 	  	"Type":"AWS::CloudFormation::Stack",
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"vpcId": { "Ref":"vpcId" },
 					"privateSubnetId": { "Ref":"privateSubnet" },
 					"vpcCidr": {"Ref" : "vpcCidr"},
 					"publicSubnetCIDR": {"Ref" : "publicSubnetCIDR"},
 					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"}
 				},
-			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/privatesubnet-acls.json"]]}
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/privatesubnet-acls.json"]]}
 			},
 			"DependsOn" : ["privateSubnet"]
 	  }

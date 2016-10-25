@@ -4,37 +4,37 @@
   "Description" : "Create lambda function needed for latest amazon ami info lookup",
 
   "Parameters" : {
-    "costCenterTag":{
+    "tagCostCenter":{
       "Type": "String",
       "Description":"tag - cost center"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment",
       "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - group name"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag",
       "AllowedValues" : ["true", "false"]
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - project name"
     },
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-    "resourcesBucketName" : {
+    "bucketResources" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
@@ -70,9 +70,9 @@
         "Comment":"Retrieves the latest Amazon Linux AMI ID"
       },
       "Properties": {
-        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "environmentTag" },{ "Ref": "projectTag" },"latestAmazonAmiInfoLambdaFunction"] ] },
+        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "tagEnvironment" },{ "Ref": "tagProject" },"latestAmazonAmiInfoLambdaFunction"] ] },
         "Code": {
-          "S3Bucket": { "Ref": "resourcesBucketName" },
+          "S3Bucket": { "Ref": "bucketResources" },
           "S3Key": { "Ref": "s3Key" }
         },
         "Handler": { "Fn::Join" : [ "", [{ "Ref": "moduleName" },".handler"] ] },

@@ -2,56 +2,56 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Provision sns alarm notification topic, optional cloudtrail for the account, lambda functions for latest ami lookup",
   "Parameters": {
-    "costCenterTag":{
+    "tagCostCenter":{
       "Type": "String",
       "Description":"tag - cost center"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment",
       "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - group name"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag",
       "AllowedValues" : ["true", "false"]
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - project name"
     },
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-    "billingAlarmThreshold" : {
+    "alarmBillingThreshold" : {
       "Description" : "Billing alarm threshold in US dollars",
       "Type" : "String"
     },
-    "cloudTrailCreate": {
-      "Description": "Determines if cloudtrail is setup or not",
-      "Type": "String",
-      "AllowedValues" : ["true", "false"]
-    },
-    "cloudTrailS3BucketName": {
+    "bucketCloudTrail": {
       "Description": "Name for the bucket to contain cloudtrail logs",
       "Type": "String"
     },
-    "cfTemplateBucketName": {
+    "bucketCfTemplates": {
       "Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks",
       "Type": "String"
     },
-    "resourcesBucketName":{
+    "bucketResources":{
       "Type":"String",
       "Description": "The name of the S3 bucket that holds project resource files"
+    },
+    "createCloudTrail": {
+      "Description": "Determines if cloudtrail is setup or not",
+      "Type": "String",
+      "AllowedValues" : ["true", "false"]
     },
     "snsTopic": {
       "Description": "Name for the sns topic receiving alarm notifications",
@@ -69,8 +69,9 @@
   },
 
   "Conditions" : {
-    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]},
-    "createCloudTrail" : {"Fn::Equals" : [{"Ref" : "cloudTrailCreate"}, "true"]}
+    "createCloudTrail" : {"Fn::Equals" : [{"Ref" : "createCloudTrail"}, "true"]},
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+
   },
 
   "Resources": {
@@ -82,20 +83,20 @@
       "Condition" : "createCloudTrail",
 			"Properties" :{
 				"Parameters" :{
-					"costCenterTag": {"Ref" : "costCenterTag"},
-          "environmentTag": {"Ref" : "environmentTag"},
-          "groupTag": {"Ref" : "groupTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-          "projectTag": {"Ref" : "projectTag"},
-          "stackNameTag": {"Ref" : "stackNameTag"},
-          "billingAlarmThreshold": {"Ref" : "billingAlarmThreshold"},
-          "cloudTrailS3BucketName": {"Ref" : "cloudTrailS3BucketName"},
-          "snsAlarmTopicArn": { "Fn::GetAtt" : [ "setupSns", "Outputs.snsTopicArn" ] }
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"},
+          "alarmBillingThreshold": {"Ref" : "alarmBillingThreshold"},
+          "bucketCloudTrail": {"Ref" : "bucketCloudTrail"},
+          "snsAlarmTopicArn": { "Fn::GetAtt" : [ "snsSetup", "Outputs.snsTopicArn" ] }
 				},
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/cloudtrail.json"]]}
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/cloudtrail.json"]]}
 		  },
-      "DependsOn" : "setupSns"
+      "DependsOn" : "snsSetup"
     },
 
     "iamSetup": {
@@ -106,58 +107,58 @@
       },
 			"Properties" :{
 				"Parameters" :{
-          "costCenterTag": {"Ref" : "costCenterTag"},
-          "environmentTag": {"Ref" : "environmentTag"},
-          "groupTag": {"Ref" : "groupTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-          "projectTag": {"Ref" : "projectTag"},
-          "stackNameTag": {"Ref" : "stackNameTag"}
+          "tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/iam-setup.json"]]}
       }
     },
 
-    "lambdaFunctions":{
+    "lambdaSetup":{
 			"Type":"AWS::CloudFormation::Stack",
       "Metadata":{
         "Comment":"Create lambda function needed for latest amazon ami info lookup"
       },
 			"Properties" :{
 				"Parameters" :{
-          "costCenterTag": {"Ref" : "costCenterTag"},
-          "environmentTag": {"Ref" : "environmentTag"},
-          "groupTag": {"Ref" : "groupTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-          "projectTag": {"Ref" : "projectTag"},
-          "stackNameTag": {"Ref" : "stackNameTag"},
-					"resourcesBucketName": {"Ref" : "resourcesBucketName"},
+          "tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"},
+					"bucketResources": {"Ref" : "bucketResources"},
 					"latestAmazonAmiInfoExecutionRoleArn": { "Fn::GetAtt" : [ "iamSetup", "Outputs.latestAmazonAmiInfoExecutionRoleArn" ] }
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/lambda-functions.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/lambda-functions.json"]]}
 			},
 			"DependsOn" : "iamSetup"
 		},
 
-    "setupSns" : {
+    "snsSetup" : {
       "Type":"AWS::CloudFormation::Stack",
       "Metadata":{
         "Comment":"Provision SNS topic for alarm/monitoring notifications."
       },
 			"Properties" :{
 				"Parameters" :{
-          "costCenterTag": {"Ref" : "costCenterTag"},
-          "environmentTag": {"Ref" : "environmentTag"},
-          "groupTag": {"Ref" : "groupTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-          "projectTag": {"Ref" : "projectTag"},
-          "stackNameTag": {"Ref" : "stackNameTag"},
+          "tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"},
           "snsTopic" : {"Ref" : "snsTopic"},
           "snsTopicEmailSubscription" : {"Ref" : "snsTopicEmailSubscription"}
 				},
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/preliminaries/setup-sns.json"]]}
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/setup-sns.json"]]}
 		  }
     }
   },
@@ -165,11 +166,11 @@
   "Outputs" : {
     "amiInfoFunctionArn":{
 			"Description" : "The arn of the latestAmazonAmiInfoLambdaFunction function",
-    	"Value" : { "Fn::GetAtt" : ["lambdaFunctions", "Outputs.amiInfoFunctionArn"] }
+    	"Value" : { "Fn::GetAtt" : ["lambdaSetup", "Outputs.amiInfoFunctionArn"] }
 		},
     "snsTopicArn":{
 			"Description" : "The arn of the SNS Topic for monitoring/alarm notifications",
-    	"Value" : { "Fn::GetAtt" : ["setupSns", "Outputs.snsTopicArn"] }
+    	"Value" : { "Fn::GetAtt" : ["snsSetup", "Outputs.snsTopicArn"] }
 		}
   }
 }

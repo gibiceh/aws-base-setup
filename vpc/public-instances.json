@@ -4,31 +4,31 @@
   "Description" : "Create autoscaling EC2 groups to host jumpbox",
 
   "Parameters" : {
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-	  "projectTag":{
+	  "tagProject":{
 	    "Type": "String",
 	    "Description":"tag - project name"
 	  },
-	  "groupTag":{
+	  "tagGroup":{
 	    "Type": "String",
 	    "Description":"tag - group name"
 	  },
-	  "costCenterTag":{
+	  "tagCostCenter":{
 	    "Type": "String",
 	    "Description":"tag - cost center"
 	  },
-		"environmentTag":{
+		"tagEnvironment":{
 	    "Type": "String",
 	    "Description":"tag - environment"
 	  },
-	  "keepAliveTag":{
+	  "tagKeepAlive":{
 	    "Type": "String",
 	    "Description":"tag - keep alive tag"
 	  },
-	  "ownerTag":{
+	  "tagOwner":{
 	    "Type": "String",
 	    "Description":"tag - product owner"
 	  },
@@ -61,11 +61,11 @@
       "Type": "String",
       "Description": "EIP allocation ID for JumpBox"
     },
-    "cfTemplateBucketName":{
+    "bucketCfTemplates":{
       "Type":"String",
       "Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
     },
-    "resourcesBucketName" : {
+    "bucketResources" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
@@ -139,13 +139,13 @@
 		  "Type":"AWS::CloudFormation::Stack",
 		  "Properties" :{
 		    "Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"instanceTypeJumpBox": {"Ref" : "instanceTypeJumpBox"},
 		      "keyName": {"Ref" : "keyName"},
 		      "snsEc2Topic": {"Ref" : "snsEc2Topic"},
@@ -153,11 +153,11 @@
 		    	"jumpBoxSecurityGroup": {"Ref" : "jumpBoxSecurityGroup"},
 					"jumpBoxInstanceProfile": {"Ref" : "jumpBoxInstanceProfile"},
 					"eipAllocationIdRdGateway": {"Ref" : "eipAllocationIdRdGateway"},
-					"resourcesBucketName": {"Ref" : "resourcesBucketName"},
+					"bucketResources": {"Ref" : "bucketResources"},
           "architecture": { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "instanceTypeJumpBox" }, "Arch" ] },
           "latestAmiFunctionArn": { "Ref" : "latestAmiFunctionArn" }
 	      },
-	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/public-instances-jumpbox.json"]]}
+	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/public-instances-jumpbox.json"]]}
 		  }
 		}
   },

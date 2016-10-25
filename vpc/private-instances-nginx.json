@@ -4,31 +4,31 @@
   "Description" : "Create autoscaling EC2 groups for Nginx Reverse Proxy and needed cloudwatch alarms",
 
   "Parameters" : {
-    "stackNameTag":{
+    "tagStack":{
       "Type": "String",
       "Description":"tag - stack name"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - stack name"
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - stack name"
     },
-    "costCenterTag":{
+    "tagCostCenter":{
       "Type": "String",
       "Description":"tag - stack name"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag"
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
@@ -57,7 +57,7 @@
       "Type": "String",
       "Description":"instance profile for nginx reverse proxy."
     },
-    "resourcesBucketName" : {
+    "bucketResources" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
@@ -116,35 +116,35 @@
         "Tags": [
           {
             "Key":"stack",
-            "Value": {"Ref": "stackNameTag"},
+            "Value": {"Ref": "tagStack"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"Name",
-            "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"nginxAutoScalingGroup"]]},
+            "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"nginxAutoScalingGroup"]]},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"project",
-            "Value":{"Ref": "projectTag"},
+            "Value":{"Ref": "tagProject"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"group",
-            "Value":{"Ref": "groupTag"},
+            "Value":{"Ref": "tagGroup"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"cost-center",
-            "Value":{"Ref": "costCenterTag"},
+            "Value":{"Ref": "tagCostCenter"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"environment",
-            "Value":{"Ref": "environmentTag"},
+            "Value":{"Ref": "tagEnvironment"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"keep-alive",
-            "Value":{"Ref": "keepAliveTag"},
+            "Value":{"Ref": "tagKeepAlive"},
             "PropagateAtLaunch" : "true"
           },{
             "Key":"owner",
-            "Value":{"Ref": "ownerTag"},
+            "Value":{"Ref": "tagOwner"},
             "PropagateAtLaunch" : "true"
           }
         ]
@@ -187,8 +187,8 @@
                 "yum update -y\n",
                 "yum install jq -y\n",
                 "LOCATION_REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document/ | jq -r .region)\n",
-                "S3_BUCKET=", { "Ref" : "resourcesBucketName" }, "\n",
-                "ENVIRONMENT=", { "Ref" : "environmentTag" }, "\n",
+                "S3_BUCKET=", { "Ref" : "bucketResources" }, "\n",
+                "ENVIRONMENT=", { "Ref" : "tagEnvironment" }, "\n",
                 "aws s3 --region $LOCATION_REGION cp s3://$S3_BUCKET/nginx-reverse-proxy/bootstrap-nginx-reverse-proxy.sh /tmp\n",
                 "bash /tmp/bootstrap-nginx-reverse-proxy.sh $S3_BUCKET $ENVIRONMENT\n"
               ]

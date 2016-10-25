@@ -1,177 +1,111 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-<<<<<<< HEAD
 	"Description" : "This nested stack will create the environment for the project infrastructure in an isolated VPC.",
-=======
-	"Description" : "This nested stack will create the environment in an isolated VPC.",
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 	"Parameters" : {
-			"stackNameTag":{
-				"Type": "String",
-				"Description":"tag - stack name"
-			},
-			"projectTag":{
-	      "Type": "String",
-	      "Description":"tag - stack name"
-	    },
-	    "groupTag":{
-	      "Type": "String",
-	      "Description":"tag - stack name"
-	    },
-<<<<<<< HEAD
-	    "costCenterTag":{
-	      "Type": "String",
-	      "Description":"tag - stack name"
-	  	},
-	    "environmentTag":{
-	      "Type": "String",
-	      "Description":"tag - environment",
-=======
-	    "environmentTag":{
-	      "Type": "String",
-	      "Description":"Tag - Environment",
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-				"AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
-	    },
-	    "keepAliveTag":{
-	      "Type": "String",
-<<<<<<< HEAD
-	      "Description":"tag - keep alive tag"
-	    },
-	    "ownerTag":{
-	      "Type": "String",
-	      "Description":"tag - product owner"
-=======
-	      "Description":"Tag - Keep Alive tag"
-	    },
-	    "ownerTag":{
-	      "Type": "String",
-	      "Description":"Tag - product owner"
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-	    },
-			"cfTemplateBucketName":{
-				"Type":"String",
-				"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
-			},
-			"resourcesBucketName":{
-<<<<<<< HEAD
-	    	"Type":"String",
-	    	"Description": "The name of the S3 bucket that holds resource files for conductor"
-	    },
-			"sshSourceIp":{
-				"Type":"String",
-	    	"Description": "ip address to allow ssh access from"
-			},
-			"vpcCidr":{
-				"Description" : "The CIDR block of the VPC",
- 				"Type" : "String"
-	  	},
-	  	"publicSubnetCidr":{
-	  		"Description" : "The CIDR block of the inbound public subnet.",
-	   		"Type": "String"
-	  	},
-			"privateSubnetCidr":{
-	     	"Description" : "The CIDR block of the primary private subnet.",
-	   		"Type": "String"
-	  	},
-			"instanceTypeAppServer":{
-	  		"Description" : "ec2 instance type for the app server",
-	  		"Type" : "String"
-	  	},
-			"iamRoleNameAppServer": {
-				"Type": "String",
-				"Description": "name of the iam role for the app server"
-			},
-			"iamRoleNameCrossStackLookup": {
-				"Type": "String",
-				"Description": "name of the iam role that enables references of resources in another cloudformation stack"
-			},
-			"keyName": {
-		  	"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
-		  	"Type": "String",
-		  	"ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
-			},
-			"preliminariesStackName":{
-	      "Type": "String",
-				"Description": "The name of the preliminaries cloudformation stack"
-	  	},
-=======
-				"Type":"String",
-				"Description": "The name of the S3 bucket that holds resource files for conductor"
-			},
-			"preliminariesStackName":{
-	      "Type": "String",
-				"Description": "The name of the preliminaries cloudformation stack"
-	  	},
-			"vpcCidr":{
-				"Description" : "The CIDR block of the VPC",
-	 			"Type" : "String"
-	  	},
-	  	"publicSubnetCIDR":{
-	  		"Description" : "The CIDR block of the inbound public subnet.",
-	   		"Type": "String"
-	  	},
-			"privateSubnetCIDR":{
-	     	"Description" : "The CIDR block of the primary private subnet.",
-	   		"Type": "String"
-	  	},
-			"instanceTypeFlamenco":{
-	  		"Description" : "ec2 instance type for the box running flamenco",
-	  		"Type" : "String"
-	  	},
-			"keyName": {
-		  	"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
-		  	"Type": "AWS::EC2::KeyPair::KeyName",
-		  	"ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
-			},
-			"createAcmCert":{
-	      "Type": "String",
-				"Description": "true or false, depending on if the stack should create ACM cert for ELB"
-	  	},
-			"existingAcmCertArn":{
-	      "Type": "String",
-				"Description": "If createAcmCert=false, ELB will associate this cert arn with itself"
-	  	},
-			"acmCertDomains": {
-		    "Description": "Comma-delimited list of the domains to be associated with acm cert",
-		    "Type": "CommaDelimitedList"
-			},
-			"iamRoleFlamenco": {
-				"Type": "String",
-		    "Description": "name of the iam role assigned to the flamenco ec2 instances"
-			},
-			"iamRoleWebServer": {
-				"Type": "String",
-		    "Description": "name of the iam role assigned to the web server ec2 instances"
-			},
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-			"doNotCreate" : {
-	      "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
-	      "Default" : "true",
-	      "Type" : "String"
-			}
+		"tagCostCenter":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "tagEnvironment":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "tagGroup":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "tagKeepAlive":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "tagOwner":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "tagProject":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
+    "tagStack":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"bucketCfTemplates":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+		},
+		"iamRoleNameAppServer": {
+			"Type": "String",
+			"Description": "name of the iam role for the app server"
+		},
+		"iamRoleNameCrossStackLookup": {
+			"Type": "String",
+			"Description": "name of the iam role that enables references of resources in another cloudformation stack"
+		},
+		"instanceTypeAppServer":{
+  		"Description" : "ec2 instance type for the app server",
+  		"Type" : "String"
+  	},
+		"keyName": {
+	  	"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+	  	"Type": "String",
+	  	"ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
+		},
+		"preliminariesStackName":{
+      "Type": "String",
+			"Description": "The name of the preliminaries cloudformation stack"
+	  },
+		"privateSubnetCidr":{
+     	"Description" : "The CIDR block of the primary private subnet.",
+   		"Type": "String"
+  	},
+		"publicSubnetCidr":{
+  		"Description" : "The CIDR block of the inbound public subnet.",
+   		"Type": "String"
+  	},
+		"bucketResources":{
+    	"Type":"String",
+    	"Description": "The name of the S3 bucket that holds resource files for conductor"
+    },
+		"sshSourceIp":{
+			"Type":"String",
+    	"Description": "ip address to allow ssh access from"
+		},
+		"vpcCidr":{
+			"Description" : "The CIDR block of the VPC",
+			"Type" : "String"
+  	},		
+		"doNotCreate" : {
+	    "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+	    "Default" : "true",
+	    "Type" : "String"
+		}
   },
 
 	"Conditions" : {
-<<<<<<< HEAD
     "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
   },
 
 	"Resources" : {
 		"baseNetwork": {
 			"Type":"AWS::CloudFormation::Stack",
+			"Metadata": {
+				"Comment":"Creates the network entities for the environment."
+			},
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"},
 					"vpcCidr": {"Ref" : "vpcCidr"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/base-network.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/base-network.json"]]}
 			}
 		},
 
@@ -179,14 +113,14 @@
 			"Type":"AWS::CloudFormation::Stack",
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"cfTemplateBucketName": {"Ref": "cfTemplateBucketName"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+          "tagEnvironment": {"Ref" : "tagEnvironment"},
+          "tagGroup": {"Ref" : "tagGroup"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+          "tagProject": {"Ref" : "tagProject"},
+          "tagStack": {"Ref" : "tagStack"},
+					"bucketCfTemplates": {"Ref": "bucketCfTemplates"},
 					"vpcCidr": {"Ref" : "vpcCidr"},
 					"publicSubnetCidr": {"Ref" : "publicSubnetCidr"},
 					"privateSubnetCidr": {"Ref" : "privateSubnetCidr"},
@@ -194,7 +128,7 @@
 					"internetGatewayId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.internetGatewayId" ] },
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 		    },
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/base-security.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/base-security.json"]]}
 			},
 			"DependsOn" : "baseNetwork"
 		},
@@ -202,10 +136,10 @@
 		"crossStackInfoPreliminariesStack": {
 		  "Type": "Custom::CrossStackInfoSNSArn",
 		  "Properties": {
-		    "ServiceToken": { "Fn::GetAtt" : ["lambdaFunctions", "Outputs.lambdaArnCrossStackLookup"] },
+		    "ServiceToken": { "Fn::GetAtt" : ["lambdaSetup", "Outputs.lambdaArnCrossStackLookup"] },
 =======
     "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]},
-		"createVpcStack" : {"Fn::Or": [{"Fn::Equals" : [{"Ref" : "environmentTag"}, "prod"]}, {"Fn::Equals" : [{"Ref" : "environmentTag"}, "dev"]}]}
+		"createVpcStack" : {"Fn::Or": [{"Fn::Equals" : [{"Ref" : "tagEnvironment"}, "prod"]}, {"Fn::Equals" : [{"Ref" : "tagEnvironment"}, "dev"]}]}
   },
 
 	"Resources" : {
@@ -213,7 +147,7 @@
 		  "Type": "AWS::Lambda::Function",
 			"Condition" : "createVpcStack",
 		  "Properties": {
-				"FunctionName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "vpcLookupCrossStackOutputs"]]},
+				"FunctionName" : {"Fn::Join":["-",[{"Ref": "tagEnvironment"}, {"Ref": "tagProject"}, "vpcLookupCrossStackOutputs"]]},
 		    "Code": {
 		      "ZipFile":  { "Fn::Join": ["\n", [
 		        "var response = require('cfn-response');",
@@ -271,7 +205,7 @@
 		    },
 		    "Path": "/",
 		    "Policies": [{
-		      "PolicyName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "vpcLookupCrossStackOutputs"]]},
+		      "PolicyName" : {"Fn::Join":["-",[{"Ref": "tagEnvironment"}, {"Ref": "tagProject"}, "vpcLookupCrossStackOutputs"]]},
 		      "PolicyDocument": {
 		        "Version": "2012-10-17",
 		        "Statement": [{
@@ -295,12 +229,12 @@
 		  "Properties": {
 		    "ServiceToken": { "Fn::GetAtt" : ["vpcLookupCrossStackOutputs", "Arn"] },
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-		    "stackNameTag": {
+		    "tagStack": {
 		      "Ref": "preliminariesStackName"
 		    }
 		  },
 <<<<<<< HEAD
-			"DependsOn": "lambdaFunctions"
+			"DependsOn": "lambdaSetup"
 		},
 
 		"iamSetup":{
@@ -315,34 +249,34 @@
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
 <<<<<<< HEAD
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"resourcesBucketName": {"Ref" : "resourcesBucketName"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+					"bucketResources": {"Ref" : "bucketResources"},
 					"iamRoleNameAppServer": {"Ref" : "iamRoleNameAppServer"},
 					"iamRoleNameCrossStackLookup": {"Ref" : "iamRoleNameCrossStackLookup"},
 					"iamRoleNameDbServer": {"Ref" : "iamRoleNameDbServer"},
 					"iamRoleNameFileServer": {"Ref" : "iamRoleNameFileServer"},
 					"iamRoleNameRdGateway": {"Ref" : "iamRoleNameRdGateway"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/iam-setup.json"]]}
 			}
 		},
 
-		"lambdaFunctions": {
+		"lambdaSetup": {
 			"Type":"AWS::CloudFormation::Stack",
 =======
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"vpcCidr": {"Ref" : "vpcCidr"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/basenetwork.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/basenetwork.json"]]}
 			}
 		},
 
@@ -352,32 +286,32 @@
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
 <<<<<<< HEAD
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"iamRoleArnCrossStackLookup": { "Fn::GetAtt" : [ "iamSetup", "Outputs.iamRoleArnCrossStackLookup" ] },
-					"functionNameCrossStackLookup": {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "crossStackLookup"]]}
+					"functionNameCrossStackLookup": {"Fn::Join":["-",[{"Ref": "tagEnvironment"}, {"Ref": "tagProject"}, "crossStackLookup"]]}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/lambda-functions.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/lambda-functions.json"]]}
 			},
 			"DependsOn": ["iamSetup"]
 =======
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"cfTemplateBucketName": {"Ref" : "cfTemplateBucketName"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+					"bucketCfTemplates": {"Ref" : "bucketCfTemplates"},
 					"vpcCidr": {"Ref" : "vpcCidr"},
 					"publicSubnetCIDR": {"Ref" : "publicSubnetCIDR"},
 					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"},
 					"internetGatewayId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.internetGatewayId" ] },
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 		    },
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/basesecurity.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/basesecurity.json"]]}
 			},
 			"DependsOn" : "baseNetwork"
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
@@ -391,27 +325,27 @@
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
 <<<<<<< HEAD
-					"costCenterTag": {"Ref" : "costCenterTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"cfTemplateBucketName": {"Ref": "cfTemplateBucketName"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+					"bucketCfTemplates": {"Ref": "bucketCfTemplates"},
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] },
 					"sshSourceIp":{"Ref":"sshSourceIp"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/security-groups.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/security-groups.json"]]}
 =======
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"cfTemplateBucketName": {"Ref" : "cfTemplateBucketName"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+					"bucketCfTemplates": {"Ref" : "bucketCfTemplates"},
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/securitygroups.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/securitygroups.json"]]}
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			},
 			"DependsOn" : "baseSecurity"
@@ -425,22 +359,22 @@
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
 <<<<<<< HEAD
-					"costCenterTag": {"Ref" : "costCenterTag"},
+					"tagCostCenter": {"Ref" : "tagCostCenter"},
 =======
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] },
 					"internalRouteTableId": { "Fn::GetAtt" : [ "baseSecurity", "Outputs.internalRouteTableId" ] },
 					"publicRouteTableId": { "Fn::GetAtt" : [ "baseSecurity", "Outputs.publicRouteTableId" ] },
-					"resourcesBucketName": {"Ref" : "resourcesBucketName"}
+					"bucketResources": {"Ref" : "bucketResources"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/vpc-endpoints.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/vpc-endpoints.json"]]}
 			},
 			"DependsOn" : "baseSecurity"
 <<<<<<< HEAD
@@ -460,18 +394,18 @@
 			"Condition" : "createVpcStack",
 			"Properties" :{
 				"Parameters" :{
-					"stackNameTag": {"Ref" : "stackNameTag"},
-					"projectTag": {"Ref" : "projectTag"},
-					"groupTag": {"Ref" : "groupTag"},
-					"environmentTag": {"Ref" : "environmentTag"},
-					"keepAliveTag": {"Ref" : "keepAliveTag"},
-					"ownerTag": {"Ref" : "ownerTag"},
-					"resourcesBucketName": {"Ref" : "resourcesBucketName"},
+					"tagStack": {"Ref" : "tagStack"},
+					"tagProject": {"Ref" : "tagProject"},
+					"tagGroup": {"Ref" : "tagGroup"},
+					"tagEnvironment": {"Ref" : "tagEnvironment"},
+					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
+					"tagOwner": {"Ref" : "tagOwner"},
+					"bucketResources": {"Ref" : "bucketResources"},
 					"lambdaCustomResourceGeneratorArn": { "Fn::GetAtt": [ "crossStackInfoPreliminariesStack", "lambdaCustomResourceGeneratorArn" ] },
 					"iamRoleFlamenco": {"Ref" : "iamRoleFlamenco"},
 					"iamRoleWebServer": {"Ref" : "iamRoleWebServer"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/iam-setup.json"]]}
 			}
 		}
 	},

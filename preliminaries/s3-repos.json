@@ -2,41 +2,41 @@
 	"AWSTemplateFormatVersion" : "2010-09-09",
 	"Description" : "Creates a dedicated bucket to hold cloudformation templates needed to provision the project stacks and to house the resources (installation files, configuration files) needed for the environment",
 	"Parameters" : {
-		"costCenterTag":{
+		"tagCostCenter":{
       "Type": "String",
       "Description":"tag - cost center"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment",
       "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - group name"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag",
       "AllowedValues" : ["true", "false"]
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - project name"
     },
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-		"cfTemplateBucketName":{
+		"bucketCfTemplates":{
 	  	"Type":"String",
 	  	"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
 	  },
-		"resourcesBucketName":{
+		"bucketResources":{
 	  	"Type":"String",
 	  	"Description": "The name of the S3 bucket that holds resource files for the environment"
 	  }
@@ -45,80 +45,80 @@
 	"Mappings":{},
 
 	"Resources" : {
-		"cfTemplateBucket":{
+		"bucketCfTemplates":{
 			"Type":"AWS::S3::Bucket",
 			"Metadata":{
 				"Comment": "Provision a dedicated bucket to hold cloudformation templates needed to provision the project stacks."
 			},
 			"Properties":{
-				"BucketName" : {"Ref" : "cfTemplateBucketName"},
+				"BucketName" : {"Ref" : "bucketCfTemplates"},
 				"Tags":[
           {
             "Key":"cost-center",
-            "Value":{"Ref": "costCenterTag"}
+            "Value":{"Ref": "tagCostCenter"}
           },
           {
             "Key":"environment",
-            "Value":{"Ref": "environmentTag"}
+            "Value":{"Ref": "tagEnvironment"}
 	        },
           {
             "Key":"group",
-            "Value":{"Ref": "groupTag"}
+            "Value":{"Ref": "tagGroup"}
           },
           {
 		        "Key":"keep-alive",
-		        "Value":{"Ref": "keepAliveTag"}
+		        "Value":{"Ref": "tagKeepAlive"}
 		      },
           {
 		        "Key":"owner",
-		        "Value":{"Ref": "ownerTag"}
+		        "Value":{"Ref": "tagOwner"}
 		      },
           {
             "Key":"project",
-            "Value":{"Ref": "projectTag"}
+            "Value":{"Ref": "tagProject"}
           },
           {
             "Key":"stack",
-            "Value": {"Ref": "stackNameTag"}
+            "Value": {"Ref": "tagStack"}
           }
         ]
       }
     },
-		"resourcesBucket":{
+		"bucketResources":{
 			"Type":"AWS::S3::Bucket",
 			"Metadata":{
 				"Comment":"Provision a dedicated bucket to hold the resources (installation files, configuration files) needed for the environment."
 			},
 			"Properties":{
-				"BucketName" : {"Ref" : "resourcesBucketName"},
+				"BucketName" : {"Ref" : "bucketResources"},
 				"Tags":[
           {
             "Key":"cost-center",
-            "Value":{"Ref": "costCenterTag"}
+            "Value":{"Ref": "tagCostCenter"}
           },
           {
             "Key":"environment",
-            "Value":{"Ref": "environmentTag"}
+            "Value":{"Ref": "tagEnvironment"}
 	        },
           {
             "Key":"group",
-            "Value":{"Ref": "groupTag"}
+            "Value":{"Ref": "tagGroup"}
           },
           {
 		        "Key":"keep-alive",
-		        "Value":{"Ref": "keepAliveTag"}
+		        "Value":{"Ref": "tagKeepAlive"}
 		      },
           {
 		        "Key":"owner",
-		        "Value":{"Ref": "ownerTag"}
+		        "Value":{"Ref": "tagOwner"}
 		      },
           {
             "Key":"project",
-            "Value":{"Ref": "projectTag"}
+            "Value":{"Ref": "tagProject"}
           },
           {
             "Key":"stack",
-            "Value": {"Ref": "stackNameTag"}
+            "Value": {"Ref": "tagStack"}
           }
         ]
       }

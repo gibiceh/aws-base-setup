@@ -2,27 +2,27 @@
 	"AWSTemplateFormatVersion" : "2010-09-09",
 	"Description" : "Creates the network entities for the environment.",
 	"Parameters" : {
-			"stackNameTag":{
+			"tagStack":{
 				"Type": "String",
 				"Description":"tag - stack name"
 			},
-			"projectTag":{
+			"tagProject":{
 	      "Type": "String",
 	      "Description":"tag - stack name"
 	    },
-	    "groupTag":{
+	    "tagGroup":{
 	      "Type": "String",
 	      "Description":"tag - stack name"
 	    },
-	    "environmentTag":{
+	    "tagEnvironment":{
 	      "Type": "String",
 	      "Description":"environment tag"
 	    },
-	    "keepAliveTag":{
+	    "tagKeepAlive":{
 	      "Type": "String",
 	      "Description":"Tag - Keep Alive tag"
 	    },
-	    "ownerTag":{
+	    "tagOwner":{
 	      "Type": "String",
 	      "Description":"Tag - product owner"
 	    },
@@ -50,25 +50,25 @@
 		  	"EnableDnsHostnames" : "true",
       	"Tags":[{
 	      	"Key":"stack",
-	      	"Value":{"Ref": "stackNameTag"}
+	      	"Value":{"Ref": "tagStack"}
 	      	},{
 	      	"Key":"Name",
-	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"vpc"]]}
+	      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"vpc"]]}
 	      	},{
 					"Key":"project",
-	        "Value":{"Ref": "projectTag"}
+	        "Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
       }
@@ -78,25 +78,25 @@
 	  	"Properties": {
 	    	"Tags": [{
 	      	"Key":"stack",
-	      	"Value": {"Ref": "stackNameTag"}
+	      	"Value": {"Ref": "tagStack"}
 	      	},{
 	      	"Key":"Name",
-	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"internetGateway"]]}
+	      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"internetGateway"]]}
 	        },{
 					"Key":"project",
-	        "Value":{"Ref": "projectTag"}
+	        "Value":{"Ref": "tagProject"}
 					},{
 					"Key":"group",
-	        "Value":{"Ref": "groupTag"}
+	        "Value":{"Ref": "tagGroup"}
 					},{
 					"Key":"environment",
-					"Value":{"Ref": "environmentTag"}
+					"Value":{"Ref": "tagEnvironment"}
 					},{
 					"Key":"keep-alive",
-					"Value":{"Ref": "keepAliveTag"}
+					"Value":{"Ref": "tagKeepAlive"}
 					},{
 					"Key":"owner",
-					"Value":{"Ref": "ownerTag"}
+					"Value":{"Ref": "tagOwner"}
 					}
 				]
 	  	}

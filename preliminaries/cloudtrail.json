@@ -2,41 +2,41 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Provision cloudtrail for the account (with s3 bucket) and set up cloudwatch billing alarms",
   "Parameters": {
-    "costCenterTag":{
+    "tagCostCenter":{
       "Type": "String",
       "Description":"tag - cost center"
     },
-    "environmentTag":{
+    "tagEnvironment":{
       "Type": "String",
       "Description":"tag - environment",
       "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
     },
-    "groupTag":{
+    "tagGroup":{
       "Type": "String",
       "Description":"tag - group name"
     },
-    "keepAliveTag":{
+    "tagKeepAlive":{
       "Type": "String",
       "Description":"tag - keep alive tag",
       "AllowedValues" : ["true", "false"]
     },
-    "ownerTag":{
+    "tagOwner":{
       "Type": "String",
       "Description":"tag - product owner"
     },
-    "projectTag":{
+    "tagProject":{
       "Type": "String",
       "Description":"tag - project name"
     },
-    "stackNameTag":{
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-    "billingAlarmThreshold" : {
+    "alarmBillingThreshold" : {
       "Description" : "Billing alarm threshold in US dollars",
       "Type" : "String"
     },
-    "cloudTrailS3BucketName": {
+    "bucketCloudTrail": {
       "Description": "Name for the bucket to contain cloudtrail logs",
       "Type": "String"
     },
@@ -54,35 +54,35 @@
       },
       "DeletionPolicy": "Retain",
       "Properties": {
-        "BucketName" : {"Ref" : "cloudTrailS3BucketName"},
+        "BucketName" : {"Ref" : "bucketCloudTrail"},
         "Tags":[
           {
             "Key":"cost-center",
-            "Value":{"Ref": "costCenterTag"}
+            "Value":{"Ref": "tagCostCenter"}
           },
           {
             "Key":"environment",
-            "Value":{"Ref": "environmentTag"}
+            "Value":{"Ref": "tagEnvironment"}
 	        },
           {
             "Key":"group",
-            "Value":{"Ref": "groupTag"}
+            "Value":{"Ref": "tagGroup"}
           },
           {
 		        "Key":"keep-alive",
-		        "Value":{"Ref": "keepAliveTag"}
+		        "Value":{"Ref": "tagKeepAlive"}
 		      },
           {
 		        "Key":"owner",
-		        "Value":{"Ref": "ownerTag"}
+		        "Value":{"Ref": "tagOwner"}
 		      },
           {
             "Key":"project",
-            "Value":{"Ref": "projectTag"}
+            "Value":{"Ref": "tagProject"}
           },
           {
             "Key":"stack",
-            "Value": {"Ref": "stackNameTag"}
+            "Value": {"Ref": "tagStack"}
           }
         ]
       }
@@ -94,7 +94,7 @@
         "Comment": "Bucket policy that allows cloudtrail to write to the cloudtrail s3 bucket"
       },
       "Properties": {
-        "Bucket": {"Ref": "cloudTrailS3BucketName"},
+        "Bucket": {"Ref": "bucketCloudTrail"},
         "PolicyDocument": {
           "Statement": [
             {
@@ -113,7 +113,7 @@
                         "",
                         [
                           {
-                            "Ref": "cloudTrailS3BucketName"
+                            "Ref": "bucketCloudTrail"
                           }
                         ]
                       ]
@@ -139,7 +139,7 @@
                           "",
                           [
                             {
-                              "Ref": "cloudTrailS3BucketName"
+                              "Ref": "bucketCloudTrail"
                             }
                           ]
                         ]
@@ -166,36 +166,36 @@
         "IncludeGlobalServiceEvents": true,
         "IsLogging": true,
         "S3BucketName": {
-          "Ref": "cloudTrailS3BucketName"
+          "Ref": "bucketCloudTrail"
         },
         "Tags":[
           {
             "Key":"cost-center",
-            "Value":{"Ref": "costCenterTag"}
+            "Value":{"Ref": "tagCostCenter"}
           },
           {
             "Key":"environment",
-            "Value":{"Ref": "environmentTag"}
+            "Value":{"Ref": "tagEnvironment"}
 	        },
           {
             "Key":"group",
-            "Value":{"Ref": "groupTag"}
+            "Value":{"Ref": "tagGroup"}
           },
           {
 		        "Key":"keep-alive",
-		        "Value":{"Ref": "keepAliveTag"}
+		        "Value":{"Ref": "tagKeepAlive"}
 		      },
           {
 		        "Key":"owner",
-		        "Value":{"Ref": "ownerTag"}
+		        "Value":{"Ref": "tagOwner"}
 		      },
           {
             "Key":"project",
-            "Value":{"Ref": "projectTag"}
+            "Value":{"Ref": "tagProject"}
           },
           {
             "Key":"stack",
-            "Value": {"Ref": "stackNameTag"}
+            "Value": {"Ref": "tagStack"}
           }
         ]
       },
@@ -210,7 +210,7 @@
       "Properties": {
         "AlarmDescription": { "Fn::Join": ["", [
           "Alarm if AWS spending is over $",
-          { "Ref": "billingAlarmThreshold" }
+          { "Ref": "alarmBillingThreshold" }
           ]]
         },
         "Namespace": "AWS/Billing",
@@ -224,7 +224,7 @@
         "Statistic": "Maximum",
         "Period": "21600",
         "EvaluationPeriods": "1",
-        "Threshold": { "Ref": "billingAlarmThreshold" },
+        "Threshold": { "Ref": "alarmBillingThreshold" },
         "ComparisonOperator": "GreaterThanThreshold",
         "AlarmActions": [
           {
