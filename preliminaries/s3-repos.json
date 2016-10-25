@@ -1,0 +1,146 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+<<<<<<< HEAD
+	"Description" : "Creates a dedicated bucket to hold cloudformation templates needed to provision the AWS environment and to house the resources (installation files, configuration files) needed for the environment",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+	  "projectTag":{
+	    "Type": "String",
+	    "Description":"tag - project name"
+	  },
+	  "groupTag":{
+	    "Type": "String",
+	    "Description":"tag - group name"
+	  },
+	  "costCenterTag":{
+	    "Type": "String",
+	    "Description":"tag - cost center"
+	  },
+		"environmentTag":{
+	    "Type": "String",
+	    "Description":"tag - environment",
+			"AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+	  },
+	  "keepAliveTag":{
+	    "Type": "String",
+	    "Description":"tag - keep alive tag"
+	  },
+	  "ownerTag":{
+	    "Type": "String",
+	    "Description":"tag - product owner"
+	  },
+=======
+	"Description" : "Creates a dedicated bucket to hold cloudformation templates needed to provision the environment and to house the resources (installation files, configuration files) needed for the environment",
+	"Parameters" : {
+		"stackNameTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"projectTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"groupTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"environmentTag":{
+			"Type": "String",
+			"Description":"environment tag"
+		},
+		"keepAliveTag":{
+			"Type": "String",
+			"Description":"Tag - Keep Alive tag"
+		},
+		"ownerTag":{
+			"Type": "String",
+			"Description":"Tag - product owner"
+		},
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+		"cfTemplateBucketName":{
+	  	"Type":"String",
+	  	"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+	  },
+		"resourcesBucketName":{
+	  	"Type":"String",
+<<<<<<< HEAD
+	  	"Description": "The name of the S3 bucket that holds resource files for conductor"
+=======
+	  	"Description": "The name of the S3 bucket that holds resource files for the environment"
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+	  }
+	},
+
+	"Mappings":{},
+
+	"Resources" : {
+		"cfTemplateBucket":{
+			"Type":"AWS::S3::Bucket",
+			"Properties":{
+				"BucketName" : {"Ref" : "cfTemplateBucketName"},
+				"Tags":[{
+		            "Key":"stack",
+		            "Value": {"Ref": "stackNameTag"}
+		        },{
+		            "Key":"project",
+		            "Value":{"Ref": "projectTag"}
+		        },{
+		            "Key":"group",
+		            "Value":{"Ref": "groupTag"}
+		        },{
+<<<<<<< HEAD
+		            "Key":"cost-center",
+		            "Value":{"Ref": "costCenterTag"}
+		        },{
+=======
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+		            "Key":"environment",
+		            "Value":{"Ref": "environmentTag"}
+		        },{
+		            "Key":"keep-alive",
+		            "Value":{"Ref": "keepAliveTag"}
+		        },{
+		            "Key":"owner",
+		            "Value":{"Ref": "ownerTag"}
+		        }
+				]
+      }
+    },
+
+		"resourcesBucket":{
+			"Type":"AWS::S3::Bucket",
+			"Properties":{
+				"BucketName" : {"Ref" : "resourcesBucketName"},
+				"Tags":[{
+		            "Key":"stack",
+		            "Value": {"Ref": "stackNameTag"}
+		        },{
+		            "Key":"project",
+		            "Value":{"Ref": "projectTag"}
+		        },{
+		            "Key":"group",
+		            "Value":{"Ref": "groupTag"}
+		        },{
+<<<<<<< HEAD
+		            "Key":"cost-center",
+		            "Value":{"Ref": "costCenterTag"}
+		        },{
+=======
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+		            "Key":"environment",
+		            "Value":{"Ref": "environmentTag"}
+		        },{
+		            "Key":"keep-alive",
+		            "Value":{"Ref": "keepAliveTag"}
+		        },{
+		            "Key":"owner",
+		            "Value":{"Ref": "ownerTag"}
+		        }
+				]
+      }
+    }
+	}
+}

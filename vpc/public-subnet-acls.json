@@ -1,0 +1,189 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required ACLs for the public subnet.",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"projectTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"groupTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"costCenterTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"environmentTag":{
+			"Type": "String",
+			"Description":"tag - environment"
+		},
+		"keepAliveTag":{
+			"Type": "String",
+			"Description":"tag - keep alive tag"
+		},
+		"ownerTag":{
+			"Type": "String",
+			"Description":"tag - product owner"
+		},
+		"vpcId":{
+	    "Type":"AWS::EC2::VPC::Id",
+	    "Description":"The ID of the VPC the subnets shall be provisioned in."
+	  },
+	  "publicSubnetId":{
+	  	"Type":"AWS::EC2::Subnet::Id",
+	  	"Description":"The ID of the public subnet."
+	  },
+		"privateSubnetCidr":{
+	   	"Description" : "The CIDR block of the primary private subnet.",
+	  	"Type": "String"
+	  },
+		"sshSourceIp":{
+			"Type":"String",
+			"Description": "ip address to allow ssh access from"
+		}
+	},
+	"Mappings":{},
+	"Resources" : {
+		"publicSubnetAcl" : {
+      "Type" : "AWS::EC2::NetworkAcl",
+	    "Properties" : {
+	    	"Tags" : [{
+	      	"Key":"stack",
+	      	"Value": {"Ref": "stackNameTag"}
+	      	},{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"publicSubnetAcl"]]}
+	        },{
+					"Key":"project",
+	      	"Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+	      "VpcId" : {"Ref" : "vpcId"}
+	  	},
+	  	"Metadata":{
+	    	"Comment":"ACL for the public subnet."
+	    }
+		},
+
+		"publicSubnetAllowInboundResponsesFromInternet" : {
+		  "Type" : "AWS::EC2::NetworkAclEntry",
+		  "Properties" : {
+		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+		    "RuleNumber" : "110",
+		    "Protocol" : "6",
+		    "RuleAction" : "allow",
+		  	"Egress" : "false",
+		    "CidrBlock" : "0.0.0.0/0",
+		    "PortRange" : { "From" : "1024", "To" : "65535" }
+		  },
+		  "Metadata":{
+		    "Comment" : "allow inbound responses to requests originating in the subnet.  Limit to linux kernel port range and ip can be narrowed down (ITSA IP, S3, etc)"
+		  }
+		},
+		"publicSubnetAllowSshInboundFromSpecificIp" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+				"RuleNumber" : "120",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "false",
+				"CidrBlock" : {"Ref": "sshSourceIp"},
+				"PortRange" : { "From" : "22", "To" : "22" }
+			},
+	    "Metadata":{
+	    	"Comment" : "allow inbound ssh from ip address assigned to sshSourceIp"
+	    }
+	  },
+
+		"publicSubnetAllowOutboundResponsesToSpecificIp" : {
+		  "Type" : "AWS::EC2::NetworkAclEntry",
+		  "Properties" : {
+		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+		    "RuleNumber" : "100",
+		    "Protocol" : "6",
+		    "RuleAction" : "allow",
+		    "Egress" : "true",
+		    "CidrBlock" : {"Ref": "sshSourceIp"},
+		    "PortRange" : { "From" : "1024", "To" : "65535" }
+		  },
+		  "Metadata":{
+		    "Comment" : "Allows outbound ssh responses to ip address assigned to sshSourceIp"
+		  }
+		},
+		"publicSubnetAllowOutboundHttpToInternet" : {
+		  "Type" : "AWS::EC2::NetworkAclEntry",
+		  "Properties" : {
+		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+		    "RuleNumber" : "110",
+		    "Protocol" : "6",
+		    "RuleAction" : "allow",
+		    "Egress" : "true",
+		    "CidrBlock" : "0.0.0.0/0",
+		    "PortRange" : { "From" : "80", "To" : "80" }
+		  },
+		  "Metadata":{
+		    "Comment" : "Allows outbound http traffic to the Internet for uploads and traffic to private subnet coming through ELB"
+		  }
+		},
+		"publicSubnetAllowOutboundHttpsToInternet" : {
+		  "Type" : "AWS::EC2::NetworkAclEntry",
+		  "Properties" : {
+		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+		    "RuleNumber" : "120",
+		    "Protocol" : "6",
+		    "RuleAction" : "allow",
+		    "Egress" : "true",
+		    "CidrBlock" : "0.0.0.0/0",
+		    "PortRange" : { "From" : "443", "To" : "443" }
+		  },
+		  "Metadata":{
+		    "Comment" : "Allows outbound https traffic to the Internet"
+		  }
+		},
+		"publicSubnetAllowOutboundSshToPrivateSubnet" : {
+			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties" : {
+				"NetworkAclId" : { "Ref" : "publicSubnetAcl" },
+				"RuleNumber" : "130",
+				"Protocol" : "6",
+				"RuleAction" : "allow",
+				"Egress" : "true",
+				"CidrBlock" : {"Ref" : "privateSubnetCidr"},
+				"PortRange" : { "From" : "22", "To" : "22" }
+			},
+			"Metadata":{
+				"Comment" : "Allows outbound ssh traffic to the private subnet"
+			}
+	  },
+
+		"publicSubnetNetworkAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : { "Ref" : "publicSubnetId" },
+				"NetworkAclId" : { "Ref" : "publicSubnetAcl" }
+			}
+		}
+	},
+	"Outputs" : {}
+}

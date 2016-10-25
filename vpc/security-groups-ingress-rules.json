@@ -1,0 +1,211 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required ingress rules for the security groups",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"appServerSecurityGroup":{
+	  	"Description" : "The security group that governs the app server",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"dbServerSecurityGroup":{
+	  	"Description" : "The security group that governs the database server",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"elbUtilityVpcSecurityGroup":{
+	  	"Description" : "The security group that governs the ELB in the public subnet of utility vpc",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"fileServerSecurityGroup":{
+	  	"Description" : "The security group that governs the file server",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+	  "rdGatewaySecurityGroup":{
+	  	"Description" : "Security Group for the rd gateway in public subnet",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"sshSourceIp":{
+			"Type": "String",
+			"Description":"Monsanto IP cidr range"
+		}
+	},
+	"Mappings":{},
+	"Resources" : {
+		"appServerRdpIngressFromTemp":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "54.165.196.80/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"appServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for app Server"
+			}
+		},
+		"appServerRdpIngressFromGeoff":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "24.107.138.47/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"appServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for app Server"
+			}
+		},
+		"appServerRdpIngressFromNiranjan":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "71.85.151.85/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"appServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for app Server"
+			}
+		},
+
+		"dbServerRdpIngressFromTemp":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "54.165.196.80/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"dbServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for db Server"
+			}
+		},
+		"dbServerRdpIngressFromGeoff":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "24.107.138.47/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"dbServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for db Server"
+			}
+		},
+		"dbServerRdpIngressFromNiranjan":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "71.85.151.85/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"dbServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for db Server"
+			}
+		},
+		"dbServerIngressFromAppServer":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"SourceSecurityGroupId" : {"Ref": "appServerSecurityGroup"},
+				"FromPort" : "0",
+				"GroupId" : {"Ref":"dbServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "65535"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  wide open access from app server to db server groups"
+			}
+		},
+
+		"elbHttpsIngressFromMonsanto":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : {"Ref" : "sshSourceIp"},
+				"FromPort" : "443",
+				"GroupId" : {"Ref":"elbUtilityVpcSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "443"
+			},
+			"Metadata":{
+				"Comment":"allow access to ELB from Monsanto IP cidr range"
+			}
+		},
+
+		"fileServerRdpIngressFromTemp":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "54.165.196.80/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"fileServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for file Server"
+			}
+		},
+		"fileServerRdpIngressFromGeoff":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "24.107.138.47/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"fileServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for file Server"
+			}
+		},
+		"fileServerRdpIngressFromNiranjan":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "71.85.151.85/32",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"fileServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  rdp access for db Server"
+			}
+		},
+		"fileServerIngressFromAppServer":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"SourceSecurityGroupId" : {"Ref": "appServerSecurityGroup"},
+				"FromPort" : "0",
+				"GroupId" : {"Ref":"fileServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "65535"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  wide open access from app server to file server groups"
+			}
+		},
+
+		"rdGatewayRdpIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "3389",
+				"GroupId" : {"Ref":"rdGatewaySecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "3389"
+			},
+			"Metadata":{
+				"Comment":"rdp access for rd gateway"
+			}
+		}
+	},
+	"Outputs" : {}
+}

@@ -1,0 +1,154 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates the network entities for the environment.",
+	"Parameters" : {
+			"stackNameTag":{
+				"Type": "String",
+				"Description":"tag - stack name"
+			},
+			"projectTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	    },
+	    "groupTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	    },
+	    "environmentTag":{
+	      "Type": "String",
+	      "Description":"environment tag"
+	    },
+	    "keepAliveTag":{
+	      "Type": "String",
+	      "Description":"Tag - Keep Alive tag"
+	    },
+	    "ownerTag":{
+	      "Type": "String",
+	      "Description":"Tag - product owner"
+	    },
+			"vpcCidr":{
+			"Description" : "The CIDR block of the VPC",
+			"Type" : "String"
+			},
+			"doNotCreate" : {
+	      "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+	      "Default" : "true",
+	      "Type" : "String"
+			}
+  	},
+  "Mappings":{
+  },
+	"Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+	"Resources" : {
+		"vpc":{
+			"Type" : "AWS::EC2::VPC",
+   		"Properties" : {
+		  	"CidrBlock" : { "Ref" : "vpcCidr" },
+		  	"EnableDnsSupport" : "true",
+		  	"EnableDnsHostnames" : "true",
+      	"Tags":[{
+	      	"Key":"stack",
+	      	"Value":{"Ref": "stackNameTag"}
+	      	},{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"vpc"]]}
+	      	},{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+      }
+   	},
+   	"internetGateway": {
+	  	"Type": "AWS::EC2::InternetGateway",
+	  	"Properties": {
+	    	"Tags": [{
+	      	"Key":"stack",
+	      	"Value": {"Ref": "stackNameTag"}
+	      	},{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"internetGateway"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+	  	}
+	  },
+	  "attachInternetGateway": {
+	  	"Type": "AWS::EC2::VPCGatewayAttachment",
+	  	"Properties": {
+	    	"VpcId": {"Ref" : "vpc"},
+	    	"InternetGatewayId": { "Ref": "internetGateway" }
+	  	}
+	  },
+
+    "eipFlamenco": {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "Domain" : "vpc"
+      },
+      "Metadata":{
+        "Comment" : "Create elastic IP to be used with the Flamenco instance"
+      }
+    },
+
+		"eipWebServer": {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "Domain" : "vpc"
+      },
+      "Metadata":{
+        "Comment" : "Create elastic IP to be used with the web server instance"
+      }
+    }
+	},
+	"Outputs" : {
+		"vpcId" : {
+      "Description" : "The ID of the VPC created",
+      "Value" : {"Ref" : "vpc"}
+    },
+    "internetGatewayId":{
+    	"Description":"The ID of the InternetGateway created.",
+    	"Value":{"Ref":"internetGateway"}
+    },
+		"eipAllocationIdFlamenco":{
+			"Description":"The ID that AWS assigns to represent the allocation of the address for use with Amazon VPC.",
+			"Value":{"Fn::GetAtt": ["eipFlamenco", "AllocationId"]}
+		},
+		"eipAllocationIdWebServer":{
+			"Description":"The ID that AWS assigns to represent the allocation of the address for use with Amazon VPC.",
+			"Value":{"Fn::GetAtt": ["eipWebServer", "AllocationId"]}
+		},
+		"eipAddressWebServer":{
+			"Description":"The public ip address that AWS assigns.  Used with the web server instance",
+			"Value":{"Ref": "eipWebServer"}
+		}
+	}
+}

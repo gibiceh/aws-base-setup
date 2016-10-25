@@ -1,0 +1,279 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required Security Groups",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+	  "projectTag":{
+	    "Type": "String",
+	    "Description":"tag - project name"
+	  },
+	  "groupTag":{
+	    "Type": "String",
+	    "Description":"tag - group name"
+	  },
+	  "costCenterTag":{
+	    "Type": "String",
+	    "Description":"tag - cost center"
+	  },
+		"environmentTag":{
+	    "Type": "String",
+	    "Description":"tag - environment"
+	  },
+	  "keepAliveTag":{
+	    "Type": "String",
+	    "Description":"tag - keep alive tag"
+	  },
+	  "ownerTag":{
+	  	"Type": "String",
+	    "Description":"tag - product owner"
+	  },
+		"cfTemplateBucketName":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+		},
+	  "vpcId":{
+	  	"Type":"AWS::EC2::VPC::Id",
+	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
+	  },
+		"sshSourceIp":{
+			"Type": "String",
+			"Description":"Monsanto IP cidr range"
+		}
+	},
+	"Mappings":{},
+	"Resources" : {
+		"appServerSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the app server in the public subnet",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"appServerSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"dbServerSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the database server in the public subnet",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"dbServerSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"elbUtilityVpcSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the ELB in the public subnet of utility vpc",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"elbUtilityVpcSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"fileServerSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the file server",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"fileServerSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"rdGatewaySecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the rd gateway in the public subnet",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"rdGatewaySecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"sgIngressRules": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "Parameters": {
+          "stackNameTag": {"Ref": "stackNameTag"},
+					"appServerSecurityGroup":{"Ref":"appServerSecurityGroup"},
+					"dbServerSecurityGroup":{"Ref":"dbServerSecurityGroup"},
+					"elbUtilityVpcSecurityGroup":{"Ref":"elbUtilityVpcSecurityGroup"},
+					"fileServerSecurityGroup":{"Ref":"fileServerSecurityGroup"},
+					"rdGatewaySecurityGroup":{"Ref":"rdGatewaySecurityGroup"},
+					"sshSourceIp":{"Ref":"sshSourceIp"}
+        },
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/security-groups-ingress-rules.json"]]}
+      },
+			"DependsOn":["appServerSecurityGroup", "dbServerSecurityGroup", "elbUtilityVpcSecurityGroup", "fileServerSecurityGroup", "rdGatewaySecurityGroup"],
+      "Metadata":{
+				"Comment" : "creates ingress rules for the security groups"
+			}
+    },
+
+	  "sgEgressRules": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "Parameters": {
+          "stackNameTag": {"Ref": "stackNameTag"},
+					"appServerSecurityGroup":{"Ref":"appServerSecurityGroup"},
+					"dbServerSecurityGroup":{"Ref":"dbServerSecurityGroup"},
+					"elbUtilityVpcSecurityGroup":{"Ref":"elbUtilityVpcSecurityGroup"},
+					"fileServerSecurityGroup":{"Ref":"fileServerSecurityGroup"},
+					"rdGatewaySecurityGroup":{"Ref":"rdGatewaySecurityGroup"}
+        },
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/security-groups-egress-rules.json"]]}
+      },
+			"DependsOn":["appServerSecurityGroup", "dbServerSecurityGroup", "elbUtilityVpcSecurityGroup", "fileServerSecurityGroup", "rdGatewaySecurityGroup"],
+      "Metadata":{
+				"Comment" : "creates egress rules for the security groups"
+			}
+    }
+	},
+	"Outputs" : {
+		"appServerSecurityGroupId":{
+			"Description" : "The ID of the app server security group",
+    	"Value" : {"Ref" : "appServerSecurityGroup"}
+		},
+		"dbServerSecurityGroupId":{
+			"Description" : "The ID of the database server security group",
+    	"Value" : {"Ref" : "dbServerSecurityGroup"}
+		},
+		"elbUtilityVpcSecurityGroupId":{
+			"Description" : "The ID of the utility vpc elb security group",
+    	"Value" : {"Ref" : "elbUtilityVpcSecurityGroup"}
+		},
+		"fileServerSecurityGroupId":{
+			"Description" : "The ID of the file server security group",
+    	"Value" : {"Ref" : "fileServerSecurityGroup"}
+		},
+		"rdGatewaySecurityGroupId":{
+			"Description" : "The ID of the jumpbox security group",
+    	"Value" : {"Ref" : "rdGatewaySecurityGroup"}
+		}
+	}
+}

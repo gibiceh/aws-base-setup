@@ -1,0 +1,144 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required Security Groups",
+	"Parameters" : {
+		"stackNameTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	  },
+	  "projectTag":{
+	    "Type": "String",
+	    "Description":"Tag - Project name"
+	  },
+	  "groupTag":{
+	    "Type": "String",
+	    "Description":"Tag - Group name"
+	  },
+		"environmentTag":{
+	    "Type": "String",
+	    "Description":"environment tag"
+	  },
+	  "keepAliveTag":{
+	    "Type": "String",
+	    "Description":"Tag - Keep Alive tag"
+	  },
+	  "ownerTag":{
+	  	"Type": "String",
+	    "Description":"Tag - product owner"
+	  },
+		"cfTemplateBucketName":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+		},
+	  "vpcId":{
+	  	"Type":"AWS::EC2::VPC::Id",
+	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
+	  }
+	},
+	"Mappings":{},
+	"Resources" : {
+		"flamencoSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the flamenco instances",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"flamencoSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"webServerSecurityGroup":{
+			"Type" : "AWS::EC2::SecurityGroup",
+			"Properties":{
+				"GroupDescription" : "The security group that governs the web server",
+				"Tags" :  [{
+					"Key":"stack",
+					"Value": {"Ref": "stackNameTag"}
+					},{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"webServerSecurityGroup"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+				"VpcId" : {"Ref":"vpcId"}
+			}
+		},
+
+		"sgIngressRules": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "Parameters": {
+          "stackNameTag": {"Ref": "stackNameTag"},
+          "flamencoSecurityGroup":{"Ref":"flamencoSecurityGroup"},
+					"webServerSecurityGroup":{"Ref":"webServerSecurityGroup"}
+        },
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/securitygroups-ingressrules.json"]]}
+      },
+			"DependsOn":["flamencoSecurityGroup", "webServerSecurityGroup"],
+      "Metadata":{
+				"Comment" : "creates ingress rules for the security groups"
+			}
+    },
+
+	  "sgEgressRules": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "Parameters": {
+          "stackNameTag": {"Ref": "stackNameTag"},
+          "flamencoSecurityGroup":{"Ref":"flamencoSecurityGroup"},
+					"webServerSecurityGroup":{"Ref":"webServerSecurityGroup"}
+        },
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/securitygroups-egressrules.json"]]}
+      },
+			"DependsOn":["flamencoSecurityGroup", "webServerSecurityGroup"],
+      "Metadata":{
+				"Comment" : "creates egress rules for the security groups"
+			}
+    }
+	},
+	"Outputs" : {
+		"flamencoSecurityGroupId":{
+			"Description" : "The ID of the flamenco security group",
+    	"Value" : {"Ref" : "flamencoSecurityGroup"}
+		},
+		"webServerSecurityGroupId":{
+			"Description" : "The ID of the web server security group",
+    	"Value" : {"Ref" : "webServerSecurityGroup"}
+		}
+	}
+}

@@ -1,0 +1,8 @@
+**/.DS_Store
+documentation
+logs/automation.log
+resources/*/*.tar
+resources/amilookup.zip
+resources/aws-slack-notify.zip
+settings.sh
+temp

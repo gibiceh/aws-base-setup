@@ -1,0 +1,75 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required egress rules for the security groups",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"flamencoSecurityGroup":{
+	  	"Description" : "Security Group for the flamenco instances in public subnet",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"webServerSecurityGroup":{
+	  	"Description" : "Security Group for the web server in the public subnet",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  }
+	},
+	"Mappings":{},
+	"Resources" : {
+		"flamencoHttpEgressToInternet":{
+			"Type":"AWS::EC2::SecurityGroupEgress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "80",
+				"GroupId" : {"Ref":"flamencoSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "80"
+			},
+			"Metadata":{
+				"Comment":"NEED TO REVIEW:  included for package updates, downloading installation files"
+			}
+		},
+		"flamencoHttpsEgressToInternet":{
+			"Type":"AWS::EC2::SecurityGroupEgress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "443",
+				"GroupId" : {"Ref":"flamencoSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "443"
+			},
+			"Metadata":{
+				"Comment":"NEED TO REVIEW:  included for package updates, downloading installation files"
+			}
+		},
+
+		"webServerHttpEgressToInternet":{
+			"Type":"AWS::EC2::SecurityGroupEgress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "80",
+				"GroupId" : {"Ref":"webServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "80"
+			},
+			"Metadata":{
+				"Comment":"NEED TO REVIEW:  included for package updates, downloading installation files"
+			}
+		},
+		"webServerHttpsEgressToInternet":{
+			"Type":"AWS::EC2::SecurityGroupEgress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "443",
+				"GroupId" : {"Ref":"webServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "443"
+			},
+			"Metadata":{
+				"Comment":"NEED TO REVIEW:  included for package updates, downloading installation files"
+			}
+		}
+	},
+	"Outputs" : {}
+}

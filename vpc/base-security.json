@@ -1,0 +1,242 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "This stack creates network security controls. Subnet partitions and ACLs",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"projectTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"groupTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"costCenterTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"environmentTag":{
+			"Type": "String",
+			"Description":"tag - environment"
+		},
+		"keepAliveTag":{
+			"Type": "String",
+			"Description":"tag - keep alive tag"
+		},
+		"ownerTag":{
+			"Type": "String",
+			"Description":"tag - product owner"
+		},
+		"cfTemplateBucketName":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+		},
+		"vpcCidr":{
+	   	"Description" : "The CIDR block of the VPC.",
+	  	"Type": "String"
+	  },
+		"publicSubnetCidr":{
+	  	"Description" : "The CIDR block of the inbound public subnet.",
+	   	"Type": "String"
+	  },
+		"privateSubnetCidr":{
+	   	"Description" : "The CIDR block of the primary private subnet.",
+	  	"Type": "String"
+	  },
+		"sshSourceIp":{
+			"Type":"String",
+			"Description": "ip address to allow ssh access from"
+		},
+		"internetGatewayId":{
+	  	"Type":"String",
+	  	"Description":"The ID of the Internet Gateway."
+	  },
+	  "vpcId":{
+	  	"Type":"AWS::EC2::VPC::Id",
+	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
+	  },
+		"doNotCreate" : {
+			"Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+			"Default" : "true",
+			"Type" : "String"
+		}
+	},
+	"Mappings":{
+		"RegionAZMapping":{
+			"us-east-1":{
+	    	"a":"us-east-1a",
+		   	"b":"us-east-1b",
+		    "c":"us-east-1d",
+		    "d":"us-east-1e"
+	    }
+	  }
+	},
+	"Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+	"Resources" : {
+		"privateSubnet":{
+	    "Type" : "AWS::EC2::Subnet",
+	    "Properties" : {
+		    "AvailabilityZone" : {"Fn::FindInMap": ["RegionAZMapping",{ "Ref" : "AWS::Region" }, "a"] },
+		    "CidrBlock" : { "Ref" : "privateSubnetCidr" },
+		    "VpcId": {"Ref" : "vpcId"},
+		    "Tags":[{
+		      "Key":"stack",
+		      "Value": {"Ref": "stackNameTag"}
+		      },{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"privateSubnet"]]}
+	        },{
+					"Key":"project",
+	      	"Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+		  },
+		  "Metadata":{
+		  	"Comment":"Designated to house private instances."
+		  }
+	  },
+
+		"privateSubnetAcl":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"costCenterTag": {"Ref" : "costCenterTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcId": { "Ref":"vpcId" },
+					"privateSubnetId": { "Ref":"privateSubnet" },
+					"vpcCidr": {"Ref" : "vpcCidr"},
+					"publicSubnetCidr": {"Ref" : "publicSubnetCidr"},
+					"privateSubnetCidr": {"Ref" : "privateSubnetCidr"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/private-subnet-acls.json"]]}
+			},
+			"DependsOn" : "privateSubnet"
+	  },
+
+	  "publicSubnet":{
+	   	"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+	  		"AvailabilityZone" : {"Fn::FindInMap": ["RegionAZMapping",{ "Ref" : "AWS::Region" }, "a"] },
+	  		"CidrBlock" : { "Ref" : "publicSubnetCidr" },
+	  		"VpcId": {"Ref" : "vpcId"},
+		    "Tags":[{
+		      "Key":"stack",
+		      "Value": {"Ref": "stackNameTag"}
+		      },{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"publicSubnet"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+	    },
+	    "Metadata":{
+		  	"Comment" : "Houses public instances (ex: jumpbox)"
+		  }
+	  },
+
+		"publicSubnetAcl":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"costCenterTag": {"Ref" : "costCenterTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcId": { "Ref":"vpcId" },
+					"publicSubnetId": { "Ref":"publicSubnet" },
+					"privateSubnetCidr": {"Ref" : "privateSubnetCidr"},
+					"sshSourceIp":{"Ref":"sshSourceIp"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/public-subnet-acls.json"]]}
+			},
+			"DependsOn" : "publicSubnet"
+	  },
+
+		"routeTables":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"costCenterTag": {"Ref" : "costCenterTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcCidr": { "Ref":"vpcCidr" },
+					"vpcId": { "Ref":"vpcId" },
+					"publicSubnetId": { "Ref":"publicSubnet" },
+					"privateSubnetId": { "Ref":"privateSubnet" },
+					"internetGatewayId": {"Ref" : "internetGatewayId"},
+					"natGatewayId": {"Ref" : "natGateway"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/route-tables.json"]]}
+			},
+			"DependsOn" : ["publicSubnet", "privateSubnet", "natGateway"]
+	  }
+	},
+
+	"Outputs" : {
+		"publicSubnetId" : {
+  		"Description" : "The ID of the public subnet created.",
+  		"Value" : {"Ref" : "publicSubnet"}
+    	},
+  	"privateSubnetId" : {
+  		"Description" : "The ID of the first private subnet created.",
+  		"Value" : {"Ref" : "privateSubnet"}
+  	},
+  	"internalRouteTableId":{
+			"Description" : "The ID of the internal route table",
+  		"Value" : { "Fn::GetAtt" : [ "routeTables", "Outputs.internalRouteTableId" ] }
+		},
+		"publicRouteTableId":{
+			"Description" : "The ID of the public route table",
+  		"Value" : { "Fn::GetAtt" : [ "routeTables", "Outputs.publicRouteTableId" ] }
+		}
+	}
+}

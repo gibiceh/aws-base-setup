@@ -1,0 +1,100 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Provision SNS topic for alarm/monitoring notifications",
+  "Parameters": {
+    "stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+    "projectTag":{
+      "Type": "String",
+<<<<<<< HEAD
+      "Description":"tag - project name"
+    },
+    "groupTag":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "costCenterTag":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "environmentTag":{
+      "Type": "String",
+      "Description":"tag - environment"
+    },
+    "keepAliveTag":{
+      "Type": "String",
+      "Description":"tag - keep alive tag"
+    },
+    "ownerTag":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "snsTopicName": {
+      "Description": "The name for the sns topic receiving billing alarm notifications",
+      "Type": "String"
+    },
+    "snsTopicEmailSubscription": {
+      "Description": "email address to subscribe to sns topic for conductor alarm notifications",
+=======
+      "Description":"Tag - Project name"
+    },
+    "groupTag":{
+      "Type": "String",
+      "Description":"Tag - Group name"
+    },
+    "environmentTag":{
+      "Type": "String",
+      "Description":"Tag - Environment"
+    },
+    "keepAliveTag":{
+      "Type": "String",
+      "Description":"Tag - Keep Alive tag"
+    },
+    "ownerTag":{
+      "Type": "String",
+      "Description":"Tag - product owner"
+    },
+    "snsAlarmNotificationsTopicName": {
+      "Description": "The name for the sns topic receiving billing alarm notifications",
+      "Type": "String"
+    },
+    "snsAlarmNotificationsTopicEmailSubscription": {
+      "Description": "email address to subscribe to sns topic for alarm notifications",
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+      "Type": "String"
+    }
+  },
+  "Resources" : {
+    "snsAlarmTopic" : {
+      "Type" : "AWS::SNS::Topic",
+      "Properties" : {
+        "Subscription" : [
+          {
+<<<<<<< HEAD
+            "Endpoint" : {"Ref": "snsTopicEmailSubscription"},
+            "Protocol" : "email"
+          }
+        ],
+        "TopicName" : {"Ref" : "snsTopicName"}
+=======
+            "Endpoint" : {"Ref": "snsAlarmNotificationsTopicEmailSubscription"},
+            "Protocol" : "email"
+          }
+        ],
+        "TopicName" : {"Ref" : "snsAlarmNotificationsTopicName"}
+>>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+      },
+      "Metadata":{
+        "Comment" : "SNS Topic to handle cloudwatch/ASG alarm notifications"
+      }
+    }
+  },
+  "Outputs" : {
+    "snsTopicArn":{
+			"Description" : "The arn of the sns topic",
+    	"Value" : {"Ref" : "snsAlarmTopic" }
+		}
+  }
+}

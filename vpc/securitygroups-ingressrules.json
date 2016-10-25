@@ -1,0 +1,106 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required ingress rules for the security groups",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+	  "flamencoSecurityGroup":{
+	  	"Description" : "Security Group for the flamenco instances in public subnet",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  },
+		"webServerSecurityGroup":{
+	  	"Description" : "Security Group for the web server in the public subnet",
+	  	"Type":"AWS::EC2::SecurityGroup::Id"
+	  }
+	},
+	"Mappings":{},
+	"Resources" : {
+		"flamencoSshIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "22",
+				"GroupId" : {"Ref":"flamencoSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "22"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  NEED TO RESTRICT SSH ACCESS. ssh access to flamenco instances from the internet"
+			}
+		},
+
+		"flamencoHttpIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "80",
+				"GroupId" : {"Ref":"flamencoSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "80"
+			},
+			"Metadata":{
+				"Comment":"allow for http requests to flamenco from the internet"
+			}
+		},
+
+		"flamencoHttpsIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "443",
+				"GroupId" : {"Ref":"flamencoSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "443"
+			},
+			"Metadata":{
+				"Comment":"allow for https requests to flamenco from the internet"
+			}
+		},
+
+
+		"webServerSshIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "22",
+				"GroupId" : {"Ref":"webServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "22"
+			},
+			"Metadata":{
+				"Comment":"TEMP:  NEED TO RESTRICT SSH ACCESS. ssh access to web server instances from the internet"
+			}
+		},
+
+		"webServerHttpIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "80",
+				"GroupId" : {"Ref":"webServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "80"
+			},
+			"Metadata":{
+				"Comment":"allow for http requests to web server from the internet"
+			}
+		},
+
+		"webServerHttpsIngressFromInternet":{
+			"Type":"AWS::EC2::SecurityGroupIngress",
+			"Properties":{
+				"CidrIp" : "0.0.0.0/0",
+				"FromPort" : "443",
+				"GroupId" : {"Ref":"webServerSecurityGroup"},
+				"IpProtocol" : "6",
+				"ToPort" : "443"
+			},
+			"Metadata":{
+				"Comment":"allow for https requests to web server from the internet"
+			}
+		}
+	},
+	"Outputs" : {}
+}

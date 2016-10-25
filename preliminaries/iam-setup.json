@@ -1,0 +1,272 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Provision iam policies for the Administrators' group, PowerUsers' group, and Force_MFA group",
+  "Parameters": {
+    "stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+    "projectTag":{
+      "Type": "String",
+      "Description":"Tag - Project name"
+    },
+    "groupTag":{
+      "Type": "String",
+      "Description":"Tag - Group name"
+    },
+    "environmentTag":{
+      "Type": "String",
+      "Description":"Tag - Environment"
+    },
+    "keepAliveTag":{
+      "Type": "String",
+      "Description":"Tag - Keep Alive tag"
+    },
+    "ownerTag":{
+      "Type": "String",
+      "Description":"Tag - product owner"
+    },
+    "snsAlarmNotificationsTopicName": {
+      "Description": "Name for the sns topic receiving billing alarm notifications",
+      "Type": "String"
+    },
+    "lambdaCustomResourceGeneratorArn":{
+      "Type":"String",
+      "Description": "The arn of the lambda function that generates custom resources"
+    },
+    "iamGroupAdministrator":{
+      "Type":"String",
+      "Description": "The name of the Administrator IAM Group"
+    },
+    "iamGroupForceMfa":{
+      "Type":"String",
+      "Description": "The name of the ForceMFA IAM Group"
+    },
+    "iamGroupPowerUsers":{
+      "Type":"String",
+      "Description": "The name of the PowerUsers IAM Group"
+    },
+    "doNotCreate" : {
+      "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created (CANNOT be used to remove already created stack resources)",
+      "Default" : "true",
+      "Type" : "String"
+    }
+  },
+
+  "Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+
+  "Resources": {
+    "createIamGroupAdministrator": {
+      "Type": "Custom::createIAMGroup",
+      "Properties": {
+        "ServiceToken": {"Ref": "lambdaCustomResourceGeneratorArn"},
+        "groupName": {"Ref": "iamGroupAdministrator"}
+      },
+	    "Metadata":{
+		  	"Comment" : "This custom resource is not to be updated, only replaced.  Enforced via stack policy"
+		  }
+    },
+
+    "createiamGroupForceMfa": {
+      "Type": "Custom::createIAMGroup",
+      "Properties": {
+        "ServiceToken": {"Ref": "lambdaCustomResourceGeneratorArn"},
+        "groupName": {"Ref": "iamGroupForceMfa"}
+      },
+	    "Metadata":{
+		  	"Comment" : "This custom resource is not to be updated, only replaced.  Enforced via stack policy"
+		  }
+    },
+
+    "createIamGroupPowerUsers": {
+      "Type": "Custom::createIAMGroup",
+      "Properties": {
+        "ServiceToken": {"Ref": "lambdaCustomResourceGeneratorArn"},
+        "groupName": {"Ref": "iamGroupPowerUsers"}
+      },
+	    "Metadata":{
+		  	"Comment" : "This custom resource is not to be updated, only replaced.  Enforced via stack policy"
+		  }
+    },
+
+    "administratorPolicy": {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "administratorGroupPolicy" ]]},
+        "PolicyDocument" : {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+          "Effect"   : "Allow",
+          "Action"   : [
+            "*"
+          ],
+          "Resource" : "*"
+          } ]
+        },
+        "Groups" : [ { "Ref" : "iamGroupAdministrator" } ]
+      },
+			"DependsOn" : "createIamGroupAdministrator"
+    },
+
+    "ForceMFAPolicy": {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "forceMfaGroupPolicy"]]},
+        "PolicyDocument" : {
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "allowAllUsersToListAccounts",
+              "Effect": "Allow",
+              "Action": [
+                "iam:ListAccountAliases",
+                "iam:ListUsers"
+              ],
+              "Resource": [
+                "arn:aws:iam:::user/*"
+              ]
+            },
+            {
+              "Sid": "allowIndividualUserToSeeTheirAccountInformation",
+              "Effect": "Allow",
+              "Action": [
+                "iam:ChangePassword",
+                "iam:CreateLoginProfile",
+                "iam:DeleteLoginProfile",
+                "iam:GetAccountPasswordPolicy",
+                "iam:GetAccountSummary",
+                "iam:GetLoginProfile",
+                "iam:UpdateLoginProfile"
+              ],
+              "Resource": [
+                "arn:aws:iam:::user/${aws:username}"
+              ]
+            },
+            {
+              "Sid": "allowIndividualUserToListTheirMFA",
+              "Effect": "Allow",
+              "Action": [
+                "iam:ListVirtualMFADevices",
+                "iam:ListMFADevices"
+              ],
+              "Resource": [
+                "arn:aws:iam:::mfa/*",
+                "arn:aws:iam:::user/${aws:username}"
+              ]
+            },
+            {
+              "Sid": "allowIndividualUserToManageThierMFA",
+              "Effect": "Allow",
+              "Action": [
+                "iam:CreateVirtualMFADevice",
+                "iam:DeactivateMFADevice",
+                "iam:DeleteVirtualMFADevice",
+                "iam:EnableMFADevice",
+                "iam:ResyncMFADevice"
+              ],
+              "Resource": [
+                "arn:aws:iam:::mfa/${aws:username}",
+                "arn:aws:iam:::user/${aws:username}"
+              ]
+            },
+            {
+              "Sid": "doNotAllowAnythingOtherThanAboveUnlessMFAd",
+              "Effect": "Deny",
+              "NotAction": "iam:*",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:MultiFactorAuthAge": "true"
+                },
+                "StringNotLike": {
+                  "aws:UserAgent": [
+                    "*aws-cli*",
+                    "*aws-sdk*"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "Groups" : [ { "Ref" : "iamGroupForceMfa" } ]
+      },
+			"DependsOn" : "createiamGroupForceMfa"
+    },
+
+    "powerUsersPolicy": {
+      "Type" : "AWS::IAM::Policy",
+      "Properties" : {
+        "PolicyName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "powerUsersGroupPolicy"]]},
+        "PolicyDocument" : {
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "NotAction": "iam:*",
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "iam:*LoginProfile",
+                "iam:*AccessKey*",
+                "iam:*SSHPublicKey*"
+              ],
+              "Resource": "arn:aws:iam:::user/${aws:username}"
+            },
+            {
+            "Effect": "Allow",
+            "Action": [
+              "iam:*Role*",
+              "iam:ListPolicies"
+            ],
+            "Resource": "*"
+            }
+          ]
+        },
+        "Groups" : [ { "Ref" : "iamGroupPowerUsers" } ]
+      },
+			"DependsOn" : "createIamGroupPowerUsers"
+    },
+
+    "lambdaAMILookupExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+              "Effect": "Allow",
+              "Principal": {"Service": ["lambda.amazonaws.com"]},
+              "Action": ["sts:AssumeRole"]
+          }]
+        },
+        "Path": "/",
+        "Policies": [{
+          "PolicyName" : {"Fn::Join":["-",[{"Ref": "environmentTag"}, {"Ref": "projectTag"}, "lambdaAMILookupExecutionPolicy"]]},
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Action": ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
+                "Resource": "arn:aws:logs:*:*:*"
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["ec2:DescribeImages"],
+                "Resource": "*"
+            }]
+          }
+        }]
+      }
+    }
+  },
+
+  "Outputs" : {
+    "lambdaAMILookupExecutionRoleArn":{
+  		"Description" : "The arn of the lambda execution role for the ami lookup",
+      "Value" : { "Fn::GetAtt" : ["lambdaAMILookupExecutionRole", "Arn"] }
+  	}
+	}
+}

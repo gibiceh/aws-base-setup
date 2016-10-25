@@ -1,0 +1,223 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "This stack creates network security controls. Subnet partitions and ACLs. Routes.",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+		"projectTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"groupTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"environmentTag":{
+			"Type": "String",
+			"Description":"environment tag"
+		},
+		"keepAliveTag":{
+			"Type": "String",
+			"Description":"Tag - Keep Alive tag"
+		},
+		"ownerTag":{
+			"Type": "String",
+			"Description":"Tag - product owner"
+		},
+		"cfTemplateBucketName":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
+		},
+		"vpcCidr":{
+	   	"Description" : "The CIDR block of the VPC.",
+	  	"Type": "String"
+	  },
+		"publicSubnetCIDR":{
+	  	"Description" : "The CIDR block of the inbound public subnet.",
+	   	"Type": "String"
+	  },
+		"privateSubnetCIDR":{
+	   	"Description" : "The CIDR block of the primary private subnet.",
+	  	"Type": "String"
+	  },
+		"internetGatewayId":{
+	  	"Type":"String",
+	  	"Description":"The ID of the Internet Gateway."
+	  },
+	  "vpcId":{
+	  	"Type":"AWS::EC2::VPC::Id",
+	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
+	  },
+		"doNotCreate" : {
+			"Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+			"Default" : "true",
+			"Type" : "String"
+		}
+	},
+	"Mappings":{
+		"RegionAZMapping":{
+			"us-east-1":{
+	    	"a":"us-east-1a",
+		   	"b":"us-east-1b",
+		    "c":"us-east-1d",
+		    "d":"us-east-1e"
+	    }
+	  }
+	},
+	"Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+	"Resources" : {
+	  "publicSubnet":{
+	   	"Type" : "AWS::EC2::Subnet",
+			"Properties" : {
+	  		"AvailabilityZone" : {"Fn::FindInMap": ["RegionAZMapping",{ "Ref" : "AWS::Region" }, "a"] },
+	  		"CidrBlock" : { "Ref" : "publicSubnetCIDR" },
+	  		"VpcId": {"Ref" : "vpcId"},
+		    "Tags":[{
+		      "Key":"stack",
+		      "Value": {"Ref": "stackNameTag"}
+		      },{
+	        "Key":"Name",
+	        "Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"publicSubnet"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+	    },
+	    "Metadata":{
+		  	"Comment" : "Houses flamenco"
+		  }
+	  },
+
+		"privateSubnet":{
+	    "Type" : "AWS::EC2::Subnet",
+	    "Properties" : {
+		    "AvailabilityZone" : {"Fn::FindInMap": ["RegionAZMapping",{ "Ref" : "AWS::Region" }, "a"] },
+		    "CidrBlock" : { "Ref" : "privateSubnetCIDR" },
+		    "VpcId": {"Ref" : "vpcId"},
+		    "Tags":[{
+		      "Key":"stack",
+		      "Value": {"Ref": "stackNameTag"}
+		      },{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"privateSubnet"]]}
+	        },{
+					"Key":"project",
+	      	"Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+		  },
+		  "Metadata":{
+		  	"Comment":"Designated to house private instances (Unused at this point)."
+		  }
+	  },
+
+		"routeTables":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcCidr": { "Ref":"vpcCidr" },
+					"vpcId": { "Ref":"vpcId" },
+					"publicSubnetId": { "Ref":"publicSubnet" },
+					"privateSubnetId": { "Ref":"privateSubnet" },
+					"gatewayId": {"Ref" : "internetGatewayId"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/routetables.json"]]}
+			},
+			"DependsOn" : ["publicSubnet", "privateSubnet"]
+	  },
+
+		"publicSubnetACL":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcId": { "Ref":"vpcId" },
+					"publicSubnetId": { "Ref":"publicSubnet" },
+					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/publicsubnet-acls.json"]]}
+			},
+			"DependsOn" : "publicSubnet"
+	  },
+
+		"privateSubnetACL":{
+	  	"Type":"AWS::CloudFormation::Stack",
+			"Properties" :{
+				"Parameters" :{
+					"stackNameTag": {"Ref" : "stackNameTag"},
+					"projectTag": {"Ref" : "projectTag"},
+					"groupTag": {"Ref" : "groupTag"},
+					"environmentTag": {"Ref" : "environmentTag"},
+					"keepAliveTag": {"Ref" : "keepAliveTag"},
+					"ownerTag": {"Ref" : "ownerTag"},
+					"vpcId": { "Ref":"vpcId" },
+					"privateSubnetId": { "Ref":"privateSubnet" },
+					"vpcCidr": {"Ref" : "vpcCidr"},
+					"publicSubnetCIDR": {"Ref" : "publicSubnetCIDR"},
+					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"}
+				},
+			"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "cfTemplateBucketName"}, "/vpc/privatesubnet-acls.json"]]}
+			},
+			"DependsOn" : ["privateSubnet"]
+	  }
+	},
+
+	"Outputs" : {
+		"publicSubnetId" : {
+  		"Description" : "The ID of the public subnet created.",
+  		"Value" : {"Ref" : "publicSubnet"}
+    },
+  	"privateSubnetId" : {
+  		"Description" : "The ID of the private subnet created.",
+  		"Value" : {"Ref" : "privateSubnet"}
+  	},
+  	"internalRouteTableId":{
+			"Description" : "The ID of the internal route table",
+  		"Value" : { "Fn::GetAtt" : [ "routeTables", "Outputs.internalRouteTableId" ] }
+		},
+		"publicRouteTableId":{
+			"Description" : "The ID of the public route table",
+  		"Value" : { "Fn::GetAtt" : [ "routeTables", "Outputs.publicRouteTableId" ] }
+		}
+	}
+}

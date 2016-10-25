@@ -1,0 +1,155 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates the network entities for the environment.",
+	"Parameters" : {
+			"stackNameTag":{
+				"Type": "String",
+				"Description":"tag - stack name"
+			},
+			"projectTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	    },
+	    "groupTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	    },
+	    "costCenterTag":{
+	      "Type": "String",
+	      "Description":"tag - stack name"
+	  	},
+	    "environmentTag":{
+	      "Type": "String",
+	      "Description":"tag - environment"
+	    },
+	    "keepAliveTag":{
+	      "Type": "String",
+	      "Description":"tag - keep alive tag"
+	    },
+	    "ownerTag":{
+	      "Type": "String",
+	      "Description":"tag - product owner"
+	    },
+			"vpcCidr":{
+				"Description" : "The CIDR block of the VPC",
+				"Type" : "String"
+			},
+			"doNotCreate" : {
+	      "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+	      "Default" : "true",
+	      "Type" : "String"
+			}
+  	},
+  "Mappings":{
+  },
+	"Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+	"Resources" : {
+		"attachInternetGateway": {
+	  	"Type": "AWS::EC2::VPCGatewayAttachment",
+	  	"Properties": {
+	    	"VpcId": {"Ref" : "vpc"},
+	    	"InternetGatewayId": { "Ref": "internetGateway" }
+	  	},
+			"DependsOn": ["internetGateway", "vpc"]
+	  },
+
+		"eipAppServer": {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "Domain" : "vpc"
+      },
+      "Metadata":{
+        "Comment" : "Create elastic IP to be used with the app Server"
+      },
+			"DependsOn": ["vpc"]
+    },
+
+		"internetGateway": {
+	  	"Type": "AWS::EC2::InternetGateway",
+	  	"Properties": {
+	    	"Tags": [{
+	      	"Key":"stack",
+	      	"Value": {"Ref": "stackNameTag"}
+	      	},{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"internetGateway"]]}
+	        },{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+	  	}
+	  },
+
+		"vpc":{
+			"Type" : "AWS::EC2::VPC",
+   		"Properties" : {
+		  	"CidrBlock" : { "Ref" : "vpcCidr" },
+		  	"EnableDnsSupport" : "true",
+		  	"EnableDnsHostnames" : "true",
+      	"Tags":[{
+	      	"Key":"stack",
+	      	"Value":{"Ref": "stackNameTag"}
+	      	},{
+	      	"Key":"Name",
+	      	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"vpc"]]}
+	      	},{
+					"Key":"project",
+	        "Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+	        "Value":{"Ref": "groupTag"}
+					},{
+					"Key":"cost-center",
+	        "Value":{"Ref": "costCenterTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				]
+      }
+   	}
+
+	},
+	"Outputs" : {
+		"vpcId" : {
+      "Description" : "The ID of the VPC created",
+      "Value" : {"Ref" : "vpc"}
+    },
+    "internetGatewayId":{
+    	"Description":"The ID of the InternetGateway created.",
+    	"Value":{"Ref":"internetGateway"}
+    },
+		"eipAddressAppServer":{
+    	"Description":"The public elastic ip to be associated with the app server.",
+    	"Value":{"Ref":"eipAppServer"}
+    },
+		"eipAllocationIdAppServer":{
+			"Description":"The ID that AWS assigns to represent the allocation of the address for use with Amazon VPC.",
+			"Value":{"Fn::GetAtt": ["eipAppServer", "AllocationId"]}
+		}
+	}
+}

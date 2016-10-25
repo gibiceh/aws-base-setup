@@ -1,0 +1,94 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+	"Description" : "Creates all required ACLs for the private subnet.",
+	"Parameters" : {
+		"stackNameTag":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
+	  "projectTag":{
+	    "Type": "String",
+	    "Description":"Tag - Project name"
+	  },
+	  "groupTag":{
+	    "Type": "String",
+	    "Description":"Tag - Group name"
+	  },
+		"environmentTag":{
+	    "Type": "String",
+	    "Description":"environment tag"
+	  },
+	  "keepAliveTag":{
+	    "Type": "String",
+	    "Description":"Tag - Keep Alive tag"
+	  },
+	  "ownerTag":{
+	    "Type": "String",
+	    "Description":"Tag - product owner"
+	  },
+		"vpcId":{
+	    "Type":"AWS::EC2::VPC::Id",
+	    "Description":"The ID of the VPC the subnets shall be provisioned in."
+	  },
+	  "privateSubnetId":{
+	  	"Type":"AWS::EC2::Subnet::Id",
+	  	"Description":"The ID of the primary private subnet."
+	  },
+		"vpcCidr":{
+	   	"Description" : "The CIDR block of the VPC.",
+	  	"Type": "String"
+	  },
+	  "publicSubnetCIDR":{
+	   	"Description" : "The CIDR block of the public subnet.",
+	  	"Type": "String"
+	  },
+		"privateSubnetCIDR":{
+	   	"Description" : "The CIDR block of the primary private subnet.",
+	  	"Type": "String"
+	  }
+	},
+	"Mappings":{},
+	"Resources" : {
+		"privateSubnetACL" : {
+    	"Type" : "AWS::EC2::NetworkAcl",
+	  	"Properties" : {
+		  	"Tags" : [{
+		    	"Key":"stack",
+		    	"Value": {"Ref": "stackNameTag"}
+		    	},{
+		    	"Key":"Name",
+		    	"Value":{"Fn::Join":["-",[{"Ref": "stackNameTag"},"privateSubnetACL"]]}
+		      },{
+					"Key":"project",
+		    	"Value":{"Ref": "projectTag"}
+					},{
+					"Key":"group",
+		    	"Value":{"Ref": "groupTag"}
+					},{
+					"Key":"environment",
+					"Value":{"Ref": "environmentTag"}
+					},{
+					"Key":"keep-alive",
+					"Value":{"Ref": "keepAliveTag"}
+					},{
+					"Key":"owner",
+					"Value":{"Ref": "ownerTag"}
+					}
+				],
+	    	"VpcId": {"Ref" : "vpcId"}
+	  	},
+	    "Metadata":{
+	    	"Comment" : "ACL for the private subnet. Allow bidirectional traffic from the public subnet."
+	    }
+	  },
+
+	  "privateSubnetAclAssociation" : {
+			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Properties" : {
+				"SubnetId" : { "Ref" : "privateSubnetId" },
+				"NetworkAclId" : { "Ref" : "privateSubnetACL" }
+			}
+		}
+	},
+	"Outputs" : {}
+}

@@ -1,0 +1,83 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "Create lambda function needed for latest amazon ami info lookup",
+
+  "Parameters" : {
+    "stackNameTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"projectTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"groupTag":{
+			"Type": "String",
+			"Description":"tag - stack name"
+		},
+		"environmentTag":{
+			"Type": "String",
+			"Description": "Tag - Environment"
+		},
+		"keepAliveTag":{
+			"Type": "String",
+			"Description":"Tag - Keep Alive tag"
+		},
+		"ownerTag":{
+			"Type": "String",
+			"Description":"Tag - product owner"
+		},
+    "resourcesBucketName" : {
+      "Description" : "The name of the bucket that contains your packaged source",
+      "Type" : "String"
+    },
+    "amiLookupIAMRoleArn" : {
+      "Description" : "The arn for the IAM role used by lambda to lookup the latest Amazon Linux AMI",
+      "Type" : "String"
+    },
+    "moduleName" : {
+      "Description" : "The name of the JavaScript file for looking up the latest AMI ID",
+      "Type" : "String",
+      "Default" : "amilookup"
+    },
+    "s3Key" : {
+      "Description" : "The name of the ZIP package for looking up the latest AMI ID",
+      "Type" : "String",
+      "Default" : "amilookup.zip"
+    },
+    "doNotCreate" : {
+      "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
+      "Default" : "true",
+      "Type" : "String"
+    }
+  },
+
+  "Conditions" : {
+    "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
+  },
+
+
+  "Resources" : {
+    "amiInfoLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "environmentTag" },{ "Ref": "projectTag" },"amiInfoLambdaFunction"] ] },
+        "Code": {
+          "S3Bucket": { "Ref": "resourcesBucketName" },
+          "S3Key": { "Ref": "s3Key" }
+        },
+        "Handler": { "Fn::Join" : [ "", [{ "Ref": "moduleName" },".handler"] ] },
+        "Role": {"Ref" : "amiLookupIAMRoleArn"},
+        "Runtime": "nodejs",
+        "Timeout": "30"
+      }
+    }
+  },
+  "Outputs" : {
+    "amiInfoFunctionArn":{
+			"Description" : "The arn of the lambda function",
+    	"Value" : { "Fn::GetAtt" : ["amiInfoLambdaFunction", "Arn"] }
+		}
+  }
+}
