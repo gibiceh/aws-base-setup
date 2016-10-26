@@ -92,7 +92,7 @@
           "tagStack": {"Ref" : "tagStack"},
           "alarmBillingThreshold": {"Ref" : "alarmBillingThreshold"},
           "bucketCloudTrail": {"Ref" : "bucketCloudTrail"},
-          "snsAlarmTopicArn": { "Fn::GetAtt" : [ "snsSetup", "Outputs.snsTopicArn" ] }
+          "snsArnAlarmTopic": { "Fn::GetAtt" : [ "snsSetup", "Outputs.snsArnTopicAlarm" ] }
 				},
         "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/cloudtrail.json"]]}
 		  },
@@ -134,7 +134,7 @@
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"},
 					"bucketResources": {"Ref" : "bucketResources"},
-					"latestAmazonAmiInfoExecutionRoleArn": { "Fn::GetAtt" : [ "iamSetup", "Outputs.latestAmazonAmiInfoExecutionRoleArn" ] }
+					"roleArnLatestAmazonAmiLookup": { "Fn::GetAtt" : [ "iamSetup", "Outputs.roleArnLatestAmazonAmiLookup" ] }
 				},
 				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/lambda-functions.json"]]}
 			},
@@ -165,12 +165,12 @@
 
   "Outputs" : {
     "amiInfoFunctionArn":{
-			"Description" : "The arn of the latestAmazonAmiInfoLambdaFunction function",
+			"Description" : "The arn of the funcLatestAmazonAmiLookup function",
     	"Value" : { "Fn::GetAtt" : ["lambdaSetup", "Outputs.amiInfoFunctionArn"] }
 		},
-    "snsTopicArn":{
+    "snsArnTopicAlarm":{
 			"Description" : "The arn of the SNS Topic for monitoring/alarm notifications",
-    	"Value" : { "Fn::GetAtt" : ["snsSetup", "Outputs.snsTopicArn"] }
+    	"Value" : { "Fn::GetAtt" : ["snsSetup", "Outputs.snsArnTopicAlarm"] }
 		}
   }
 }

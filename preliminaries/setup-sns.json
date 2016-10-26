@@ -43,7 +43,7 @@
   },
 
   "Resources" : {
-    "snsAlarmTopic" : {
+    "snsTopicAlarm" : {
       "Type" : "AWS::SNS::Topic",
       "Metadata":{
         "Comment" : "SNS Topic to handle cloudwatch/ASG alarm notifications"
@@ -61,9 +61,9 @@
   },
 
   "Outputs" : {
-    "snsTopicArn":{
+    "snsArnTopicAlarm":{
 			"Description" : "The arn of the sns topic",
-    	"Value" : {"Ref" : "snsAlarmTopic" }
+    	"Value" : {"Ref" : "snsTopicAlarm" }
 		}
   }
 }

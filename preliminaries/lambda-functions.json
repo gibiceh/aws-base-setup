@@ -38,17 +38,17 @@
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
-    "latestAmazonAmiInfoExecutionRoleArn" : {
+    "roleArnLatestAmazonAmiLookup" : {
       "Description" : "The arn for the IAM role used by lambda to lookup the latest Amazon Linux AMI",
       "Type" : "String"
     },
     "moduleName" : {
-      "Description" : "The name of the JavaScript file for looking up the latest Amazon Linux AMI ID",
+      "Description" : "Configured within cloudformation.  The name of the JavaScript file for looking up the latest Amazon Linux AMI ID",
       "Type" : "String",
-      "Default" : "amilookup"
+      "Default" : "index"
     },
     "s3Key" : {
-      "Description" : "The name of the ZIP package for looking up the latest Amazon Linux AMI ID",
+      "Description" : "Configured within cloudformation.  The name of the ZIP package for looking up the latest Amazon Linux AMI ID",
       "Type" : "String",
       "Default" : "amilookup.zip"
     },
@@ -64,29 +64,30 @@
   },
 
   "Resources" : {
-    "latestAmazonAmiInfoLambdaFunction": {
+    "funcLatestAmazonAmiLookup": {
       "Type": "AWS::Lambda::Function",
       "Metadata":{
-        "Comment":"Retrieves the latest Amazon Linux AMI ID"
+        "Comment":"Retrieves the latest Amazon Linux AMI ID",
+        "Comment2":"Dependent on resources/upload-bootstrap-files.sh to zip up resources/amilookup at resources/amilookup.zip"
       },
       "Properties": {
-        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "tagEnvironment" },{ "Ref": "tagProject" },"latestAmazonAmiInfoLambdaFunction"] ] },
+        "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "tagEnvironment" },{ "Ref": "tagProject" },"funcLatestAmazonAmiLookup"] ] },
         "Code": {
           "S3Bucket": { "Ref": "bucketResources" },
           "S3Key": { "Ref": "s3Key" }
         },
         "Handler": { "Fn::Join" : [ "", [{ "Ref": "moduleName" },".handler"] ] },
-        "Role": {"Ref" : "latestAmazonAmiInfoExecutionRoleArn"},
+        "Role": {"Ref" : "roleArnLatestAmazonAmiLookup"},
         "Runtime": "nodejs",
         "Timeout": "30"
       }
     }
   },
-  
+
   "Outputs" : {
     "amiInfoFunctionArn":{
 			"Description" : "The arn of the lambda function that retrieves the latest Amazon Linux AMI ID",
-    	"Value" : { "Fn::GetAtt" : ["latestAmazonAmiInfoLambdaFunction", "Arn"] }
+    	"Value" : { "Fn::GetAtt" : ["funcLatestAmazonAmiLookup", "Arn"] }
 		}
   }
 }

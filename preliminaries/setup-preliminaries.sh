@@ -10,7 +10,7 @@
 #:
 #: Notes:
 #:	- aws cli installed and configured
-#:	- The s3 bucket name cannot already exist prior to running this script.
+#:	- The s3 buckets (bucketCfTemplates and bucketResources) name cannot already exist prior to running this script.
 #: 	- settings.sh
 #:		- contains parameters (bucket names, stack name, tags, etc)
 #:			used in the Cloudformation create-stack call)

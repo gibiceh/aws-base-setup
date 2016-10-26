@@ -44,7 +44,7 @@
   },
 
   "Resources": {
-    "latestAmazonAmiLookupExecutionPolicy":{
+    "policyLatestAmazonAmiLookup":{
       "Type": "AWS::IAM::ManagedPolicy",
       "Metadata":{
         "Comment":"Provision iam policy attached to {\"Ref\":\"lambdaAMILookupExecutionRole\"}",
@@ -76,7 +76,7 @@
       }
     },
 
-    "latestAmazonAmiLookupExecutionRole": {
+    "roleLatestAmazonAmiLookup": {
       "Type": "AWS::IAM::Role",
       "Metadata":{
         "Comment":"Provision iam role to be used with the lambda function that identifies the latest Amazon Linux AMI"
@@ -90,17 +90,17 @@
               "Action": ["sts:AssumeRole"]
           }]
         },
-        "ManagedPolicyArns": [ {"Ref": "latestAmazonAmiLookupExecutionPolicy"}],
+        "ManagedPolicyArns": [ {"Ref": "policyLatestAmazonAmiLookup"}],
         "Path": "/"
       },
-      "DependsOn":"latestAmazonAmiLookupExecutionPolicy"
+      "DependsOn":"policyLatestAmazonAmiLookup"
     }
   },
 
   "Outputs" : {
-    "latestAmazonAmiInfoExecutionRoleArn":{
+    "roleArnLatestAmazonAmiLookup":{
   		"Description" : "The arn of the lambda execution role for the latest Amazon Linux AMI lookup",
-      "Value" : { "Fn::GetAtt" : ["latestAmazonAmiLookupExecutionRole", "Arn"] }
+      "Value" : { "Fn::GetAtt" : ["roleLatestAmazonAmiLookup", "Arn"] }
   	}
 	}
 }
