@@ -30,11 +30,11 @@
          "Type": "String",
          "Description":"tag - product owner"
        },
- 			 "bucketResources":{
+ 			 "bucketNameResources":{
  	    	 "Type":"String",
  	    	 "Description": "The name of the S3 bucket that holds resource files for conductor"
  	     },
-       "iamRoleNameAppServer": {
+       "roleNameAppServer": {
          "Type": "String",
          "Description": "name of the iam role for the app server"
        },
@@ -86,7 +86,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -95,7 +95,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/app-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}, "/app-server/*"]]}
               }
             ]
           }
@@ -104,7 +104,7 @@
       "appServerRole":{
         "Type": "AWS::IAM::Role",
         "Properties": {
-          "RoleName": {"Ref": "iamRoleNameAppServer"},
+          "RoleName": {"Ref": "roleNameAppServer"},
           "AssumeRolePolicyDocument": {
             "Version" : "2012-10-17",
             "Statement": [ {
@@ -150,7 +150,7 @@
        "Type": "String",
        "Description":"Tag - product owner"
      },
- 		 "bucketResources":{
+ 		 "bucketNameResources":{
  	  	 "Type":"String",
  	  	 "Description": "The name of the S3 bucket that holds resource files for conductor"
  	   },
@@ -212,7 +212,7 @@
                   "s3:GetBucketLocation",
                   "s3:GetObject"
               ],
-              "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/*"]]}
+              "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}, "/*"]]}
             },
             {
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
@@ -293,7 +293,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -302,7 +302,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/db-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}, "/db-server/*"]]}
               }
             ]
           }
@@ -357,7 +357,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -366,7 +366,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/file-server/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}, "/file-server/*"]]}
               }
             ]
           }
@@ -421,7 +421,7 @@
                     "s3:ListBucket",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}]]}
               },
               {
                 "Effect": "Allow",
@@ -430,7 +430,7 @@
                     "s3:GetBucketLocation",
                     "s3:GetObject"
                 ],
-                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketResources"}, "/rd-gateway/*"]]}
+                "Resource": {"Fn::Join" : ["",["arn:aws:s3:::", {"Ref" : "bucketNameResources"}, "/rd-gateway/*"]]}
               }
             ]
           }

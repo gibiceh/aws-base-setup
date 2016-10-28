@@ -32,11 +32,11 @@
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-		"bucketCfTemplates":{
+		"bucketNameCfTemplates":{
 	  	"Type":"String",
 	  	"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
 	  },
-		"bucketResources":{
+		"bucketNameResources":{
 	  	"Type":"String",
 	  	"Description": "The name of the S3 bucket that holds resource files for the environment"
 	  }
@@ -51,7 +51,7 @@
 				"Comment": "Provision a dedicated bucket to hold cloudformation templates needed to provision the project stacks."
 			},
 			"Properties":{
-				"BucketName" : {"Ref" : "bucketCfTemplates"},
+				"BucketName" : {"Ref" : "bucketNameCfTemplates"},
 				"Tags":[
           {
             "Key":"cost-center",
@@ -90,7 +90,7 @@
 				"Comment":"Provision a dedicated bucket to hold the resources (installation files, configuration files) needed for the environment."
 			},
 			"Properties":{
-				"BucketName" : {"Ref" : "bucketResources"},
+				"BucketName" : {"Ref" : "bucketNameResources"},
 				"Tags":[
           {
             "Key":"cost-center",

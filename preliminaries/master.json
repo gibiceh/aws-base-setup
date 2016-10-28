@@ -36,15 +36,15 @@
       "Description" : "Billing alarm threshold in US dollars",
       "Type" : "String"
     },
-    "bucketCloudTrail": {
+    "bucketNameCloudTrail": {
       "Description": "Name for the bucket to contain cloudtrail logs",
       "Type": "String"
     },
-    "bucketCfTemplates": {
+    "bucketNameCfTemplates": {
       "Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks",
       "Type": "String"
     },
-    "bucketResources":{
+    "bucketNameResources":{
       "Type":"String",
       "Description": "The name of the S3 bucket that holds project resource files"
     },
@@ -91,10 +91,10 @@
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"},
           "alarmBillingThreshold": {"Ref" : "alarmBillingThreshold"},
-          "bucketCloudTrail": {"Ref" : "bucketCloudTrail"},
+          "bucketNameCloudTrail": {"Ref" : "bucketNameCloudTrail"},
           "snsArnAlarmTopic": { "Fn::GetAtt" : [ "snsSetup", "Outputs.snsArnTopicAlarm" ] }
 				},
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/cloudtrail.json"]]}
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/preliminaries/cloudtrail.json"]]}
 		  },
       "DependsOn" : "snsSetup"
     },
@@ -115,7 +115,7 @@
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/preliminaries/iam-setup.json"]]}
       }
     },
 
@@ -133,10 +133,10 @@
 					"tagOwner": {"Ref" : "tagOwner"},
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"},
-					"bucketResources": {"Ref" : "bucketResources"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
 					"roleArnLatestAmazonAmiLookup": { "Fn::GetAtt" : [ "iamSetup", "Outputs.roleArnLatestAmazonAmiLookup" ] }
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/lambda-functions.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/preliminaries/lambda-functions.json"]]}
 			},
 			"DependsOn" : "iamSetup"
 		},
@@ -158,7 +158,7 @@
           "snsTopic" : {"Ref" : "snsTopic"},
           "snsTopicEmailSubscription" : {"Ref" : "snsTopicEmailSubscription"}
 				},
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/preliminaries/setup-sns.json"]]}
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/preliminaries/setup-sns.json"]]}
 		  }
     }
   },
@@ -166,11 +166,13 @@
   "Outputs" : {
     "amiInfoFunctionArn":{
 			"Description" : "The arn of the funcLatestAmazonAmiLookup function",
-    	"Value" : { "Fn::GetAtt" : ["lambdaSetup", "Outputs.amiInfoFunctionArn"] }
+    	"Value" : { "Fn::GetAtt" : ["lambdaSetup", "Outputs.amiInfoFunctionArn"] },
+      "Export" : { "Name" : {"Fn::Sub": "${AWS::StackName}-amiInfoFunctionArn" }}
 		},
     "snsArnTopicAlarm":{
 			"Description" : "The arn of the SNS Topic for monitoring/alarm notifications",
-    	"Value" : { "Fn::GetAtt" : ["snsSetup", "Outputs.snsArnTopicAlarm"] }
+    	"Value" : { "Fn::GetAtt" : ["snsSetup", "Outputs.snsArnTopicAlarm"] },
+      "Export" : { "Name" : {"Fn::Sub": "${AWS::StackName}-snsArnTopicAlarm" }}
 		}
   }
 }

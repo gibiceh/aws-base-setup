@@ -30,7 +30,7 @@
 	  	"Type": "String",
 	    "Description":"tag - product owner"
 	  },
-		"bucketCfTemplates":{
+		"bucketNameCfTemplates":{
 			"Type":"String",
 			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
 		},
@@ -38,7 +38,7 @@
 	  	"Type":"AWS::EC2::VPC::Id",
 	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
 	  },
-		"sshSourceIp":{
+		"cidrSshSource":{
 			"Type": "String",
 			"Description":"Monsanto IP cidr range"
 		}
@@ -225,9 +225,9 @@
 					"elbUtilityVpcSecurityGroup":{"Ref":"elbUtilityVpcSecurityGroup"},
 					"fileServerSecurityGroup":{"Ref":"fileServerSecurityGroup"},
 					"rdGatewaySecurityGroup":{"Ref":"rdGatewaySecurityGroup"},
-					"sshSourceIp":{"Ref":"sshSourceIp"}
+					"cidrSshSource":{"Ref":"cidrSshSource"}
         },
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/security-groups-ingress-rules.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/security-groups-ingress-rules.json"]]}
       },
 			"DependsOn":["appServerSecurityGroup", "dbServerSecurityGroup", "elbUtilityVpcSecurityGroup", "fileServerSecurityGroup", "rdGatewaySecurityGroup"],
       "Metadata":{
@@ -246,7 +246,7 @@
 					"fileServerSecurityGroup":{"Ref":"fileServerSecurityGroup"},
 					"rdGatewaySecurityGroup":{"Ref":"rdGatewaySecurityGroup"}
         },
-        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/security-groups-egress-rules.json"]]}
+        "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/security-groups-egress-rules.json"]]}
       },
 			"DependsOn":["appServerSecurityGroup", "dbServerSecurityGroup", "elbUtilityVpcSecurityGroup", "fileServerSecurityGroup", "rdGatewaySecurityGroup"],
       "Metadata":{

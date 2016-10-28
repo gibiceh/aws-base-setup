@@ -38,11 +38,11 @@
 	  	"Type":"AWS::EC2::Subnet::Id",
 	  	"Description":"The ID of the public subnet."
 	  },
-		"privateSubnetCidr":{
+		"cidrPrivateSubnet":{
 	   	"Description" : "The CIDR block of the primary private subnet.",
 	  	"Type": "String"
 	  },
-		"sshSourceIp":{
+		"cidrSshSource":{
 			"Type":"String",
 			"Description": "ip address to allow ssh access from"
 		}
@@ -108,11 +108,11 @@
 				"Protocol" : "6",
 				"RuleAction" : "allow",
 				"Egress" : "false",
-				"CidrBlock" : {"Ref": "sshSourceIp"},
+				"CidrBlock" : {"Ref": "cidrSshSource"},
 				"PortRange" : { "From" : "22", "To" : "22" }
 			},
 	    "Metadata":{
-	    	"Comment" : "allow inbound ssh from ip address assigned to sshSourceIp"
+	    	"Comment" : "allow inbound ssh from ip address assigned to cidrSshSource"
 	    }
 	  },
 
@@ -124,11 +124,11 @@
 		    "Protocol" : "6",
 		    "RuleAction" : "allow",
 		    "Egress" : "true",
-		    "CidrBlock" : {"Ref": "sshSourceIp"},
+		    "CidrBlock" : {"Ref": "cidrSshSource"},
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
 		  },
 		  "Metadata":{
-		    "Comment" : "Allows outbound ssh responses to ip address assigned to sshSourceIp"
+		    "Comment" : "Allows outbound ssh responses to ip address assigned to cidrSshSource"
 		  }
 		},
 		"publicSubnetAllowOutboundHttpToInternet" : {
@@ -169,7 +169,7 @@
 				"Protocol" : "6",
 				"RuleAction" : "allow",
 				"Egress" : "true",
-				"CidrBlock" : {"Ref" : "privateSubnetCidr"},
+				"CidrBlock" : {"Ref" : "cidrPrivateSubnet"},
 				"PortRange" : { "From" : "22", "To" : "22" }
 			},
 			"Metadata":{

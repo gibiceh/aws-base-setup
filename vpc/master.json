@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-	"Description" : "This nested stack will create the environment for the project infrastructure in an isolated VPC.",
+	"Description" : "This nested stack will create the vpc resources for the project.",
 	"Parameters" : {
 		"tagCostCenter":{
       "Type": "String",
@@ -32,51 +32,47 @@
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-		"bucketCfTemplates":{
+		"bucketNameCfTemplates":{
 			"Type":"String",
 			"Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
 		},
-		"iamRoleNameAppServer": {
-			"Type": "String",
-			"Description": "name of the iam role for the app server"
-		},
-		"iamRoleNameCrossStackLookup": {
-			"Type": "String",
-			"Description": "name of the iam role that enables references of resources in another cloudformation stack"
-		},
-		"instanceTypeAppServer":{
-  		"Description" : "ec2 instance type for the app server",
-  		"Type" : "String"
+		"bucketNameResources":{
+    	"Type":"String",
+    	"Description": "The name of the S3 bucket that holds resources (installation files, configuration files) needed for the environment."
+    },
+		"cidrPrivateSubnet":{
+     	"Description" : "The CIDR block of the primary private subnet.",
+   		"Type": "String"
   	},
-		"keyName": {
+		"cidrPublicSubnet":{
+  		"Description" : "The CIDR block of the primary public subnet.",
+   		"Type": "String"
+  	},
+		"cidrSshSource":{
+			"Type":"String",
+    	"Description": "ip cidr block to allow ssh access from"
+		},
+		"cidrVpc":{
+			"Description" : "The CIDR block of the VPC",
+			"Type" : "String"
+  	},
+		"ec2KeyPair": {
 	  	"Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
 	  	"Type": "String",
 	  	"ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
 		},
-		"preliminariesStackName":{
+		"instTypeAppServer":{
+  		"Description" : "ec2 instance type for the app server",
+  		"Type" : "String"
+  	},
+		"roleNameAppServer": {
+			"Type": "String",
+			"Description": "name of the iam role for the app server"
+		},
+		"stackNamePreliminaries":{
       "Type": "String",
 			"Description": "The name of the preliminaries cloudformation stack"
-	  },
-		"privateSubnetCidr":{
-     	"Description" : "The CIDR block of the primary private subnet.",
-   		"Type": "String"
-  	},
-		"publicSubnetCidr":{
-  		"Description" : "The CIDR block of the inbound public subnet.",
-   		"Type": "String"
-  	},
-		"bucketResources":{
-    	"Type":"String",
-    	"Description": "The name of the S3 bucket that holds resource files for conductor"
-    },
-		"sshSourceIp":{
-			"Type":"String",
-    	"Description": "ip address to allow ssh access from"
-		},
-		"vpcCidr":{
-			"Description" : "The CIDR block of the VPC",
-			"Type" : "String"
-  	},		
+	  },		
 		"doNotCreate" : {
 	    "Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
 	    "Default" : "true",
@@ -103,9 +99,9 @@
 					"tagOwner": {"Ref" : "tagOwner"},
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"},
-					"vpcCidr": {"Ref" : "vpcCidr"}
+					"cidrVpc": {"Ref" : "cidrVpc"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/base-network.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/base-network.json"]]}
 			}
 		},
 
@@ -120,15 +116,15 @@
 					"tagOwner": {"Ref" : "tagOwner"},
           "tagProject": {"Ref" : "tagProject"},
           "tagStack": {"Ref" : "tagStack"},
-					"bucketCfTemplates": {"Ref": "bucketCfTemplates"},
-					"vpcCidr": {"Ref" : "vpcCidr"},
-					"publicSubnetCidr": {"Ref" : "publicSubnetCidr"},
-					"privateSubnetCidr": {"Ref" : "privateSubnetCidr"},
-					"sshSourceIp":{"Ref":"sshSourceIp"},
+					"bucketNameCfTemplates": {"Ref": "bucketNameCfTemplates"},
+					"cidrVpc": {"Ref" : "cidrVpc"},
+					"cidrPublicSubnet": {"Ref" : "cidrPublicSubnet"},
+					"cidrPrivateSubnet": {"Ref" : "cidrPrivateSubnet"},
+					"cidrSshSource":{"Ref":"cidrSshSource"},
 					"internetGatewayId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.internetGatewayId" ] },
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 		    },
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/base-security.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/base-security.json"]]}
 			},
 			"DependsOn" : "baseNetwork"
 		},
@@ -230,7 +226,7 @@
 		    "ServiceToken": { "Fn::GetAtt" : ["vpcLookupCrossStackOutputs", "Arn"] },
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 		    "tagStack": {
-		      "Ref": "preliminariesStackName"
+		      "Ref": "stackNamePreliminaries"
 		    }
 		  },
 <<<<<<< HEAD
@@ -257,14 +253,14 @@
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"bucketResources": {"Ref" : "bucketResources"},
-					"iamRoleNameAppServer": {"Ref" : "iamRoleNameAppServer"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
+					"roleNameAppServer": {"Ref" : "roleNameAppServer"},
 					"iamRoleNameCrossStackLookup": {"Ref" : "iamRoleNameCrossStackLookup"},
 					"iamRoleNameDbServer": {"Ref" : "iamRoleNameDbServer"},
 					"iamRoleNameFileServer": {"Ref" : "iamRoleNameFileServer"},
 					"iamRoleNameRdGateway": {"Ref" : "iamRoleNameRdGateway"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/iam-setup.json"]]}
 			}
 		},
 
@@ -274,9 +270,9 @@
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"vpcCidr": {"Ref" : "vpcCidr"}
+					"cidrVpc": {"Ref" : "cidrVpc"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/basenetwork.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/basenetwork.json"]]}
 			}
 		},
 
@@ -297,21 +293,21 @@
 					"iamRoleArnCrossStackLookup": { "Fn::GetAtt" : [ "iamSetup", "Outputs.iamRoleArnCrossStackLookup" ] },
 					"functionNameCrossStackLookup": {"Fn::Join":["-",[{"Ref": "tagEnvironment"}, {"Ref": "tagProject"}, "crossStackLookup"]]}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/lambda-functions.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/lambda-functions.json"]]}
 			},
 			"DependsOn": ["iamSetup"]
 =======
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"bucketCfTemplates": {"Ref" : "bucketCfTemplates"},
-					"vpcCidr": {"Ref" : "vpcCidr"},
-					"publicSubnetCIDR": {"Ref" : "publicSubnetCIDR"},
-					"privateSubnetCIDR": {"Ref" : "privateSubnetCIDR"},
+					"bucketNameCfTemplates": {"Ref" : "bucketNameCfTemplates"},
+					"cidrVpc": {"Ref" : "cidrVpc"},
+					"cidrPublicSubnet": {"Ref" : "cidrPublicSubnet"},
+					"cidrPrivateSubnet": {"Ref" : "cidrPrivateSubnet"},
 					"internetGatewayId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.internetGatewayId" ] },
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 		    },
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/basesecurity.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/basesecurity.json"]]}
 			},
 			"DependsOn" : "baseNetwork"
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
@@ -333,19 +329,19 @@
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"bucketCfTemplates": {"Ref": "bucketCfTemplates"},
+					"bucketNameCfTemplates": {"Ref": "bucketNameCfTemplates"},
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] },
-					"sshSourceIp":{"Ref":"sshSourceIp"}
+					"cidrSshSource":{"Ref":"cidrSshSource"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/security-groups.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/security-groups.json"]]}
 =======
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"bucketCfTemplates": {"Ref" : "bucketCfTemplates"},
+					"bucketNameCfTemplates": {"Ref" : "bucketNameCfTemplates"},
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] }
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/securitygroups.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/securitygroups.json"]]}
 >>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
 			},
 			"DependsOn" : "baseSecurity"
@@ -372,9 +368,9 @@
 					"vpcId": { "Fn::GetAtt" : [ "baseNetwork", "Outputs.vpcId" ] },
 					"internalRouteTableId": { "Fn::GetAtt" : [ "baseSecurity", "Outputs.internalRouteTableId" ] },
 					"publicRouteTableId": { "Fn::GetAtt" : [ "baseSecurity", "Outputs.publicRouteTableId" ] },
-					"bucketResources": {"Ref" : "bucketResources"}
+					"bucketNameResources": {"Ref" : "bucketNameResources"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/vpc-endpoints.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/vpc-endpoints.json"]]}
 			},
 			"DependsOn" : "baseSecurity"
 <<<<<<< HEAD
@@ -400,12 +396,12 @@
 					"tagEnvironment": {"Ref" : "tagEnvironment"},
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
-					"bucketResources": {"Ref" : "bucketResources"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
 					"lambdaCustomResourceGeneratorArn": { "Fn::GetAtt": [ "crossStackInfoPreliminariesStack", "lambdaCustomResourceGeneratorArn" ] },
 					"iamRoleFlamenco": {"Ref" : "iamRoleFlamenco"},
 					"iamRoleWebServer": {"Ref" : "iamRoleWebServer"}
 				},
-				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/iam-setup.json"]]}
+				"TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/iam-setup.json"]]}
 			}
 		}
 	},

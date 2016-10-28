@@ -48,7 +48,7 @@
       "Description" : "ec2 instance type for the nginx reverse proxy asg",
       "Type" : "String"
     },
-    "keyName" : {
+    "ec2KeyPair" : {
       "Description" : "The EC2 Key Pair to allow SSH access to the instances",
       "Type" : "String",
       "ConstraintDescription" : "must be the name of an existing EC2 KeyPair."
@@ -93,11 +93,11 @@
       "Description" : "Security Group for the ELB to handle traffic for nginx reverse proxy",
       "Type":"AWS::EC2::SecurityGroup::Id"
     },
-    "bucketCfTemplates":{
+    "bucketNameCfTemplates":{
       "Type":"String",
       "Description": "The name of the S3 bucket that holds the cloudformation templates used in nested stacks"
     },
-    "bucketResources" : {
+    "bucketNameResources" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
@@ -313,17 +313,17 @@
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
 					"instanceTypeNginx": {"Ref" : "instanceTypeNginx"},
-		      "keyName": {"Ref" : "keyName"},
+		      "ec2KeyPair": {"Ref" : "ec2KeyPair"},
 		      "snsEc2Topic": {"Ref" : "snsEc2Topic"},
 		      "privateSubnetId": {"Ref" : "privateSubnetId"},
 		    	"nginxSecurityGroup": {"Ref" : "nginxSecurityGroup"},
 					"nginxInstanceProfile": {"Ref" : "nginxInstanceProfile"},
-					"bucketResources": {"Ref" : "bucketResources"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
           "architecture": { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "instanceTypeNginx" }, "Arch" ] },
           "nginxElbName": {"Ref" : "nginxElb"},
           "latestAmiFunctionArn": { "Ref" : "latestAmiFunctionArn" }
 	      },
-	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/private-instances-nginx.json"]]}
+	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/private-instances-nginx.json"]]}
 		  },
       "DependsOn": "privateEc2Jenkins"
 		},
@@ -340,16 +340,16 @@
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
 					"instanceTypeJenkins": {"Ref" : "instanceTypeJenkins"},
-		      "keyName": {"Ref" : "keyName"},
+		      "ec2KeyPair": {"Ref" : "ec2KeyPair"},
 		      "snsEc2Topic": {"Ref" : "snsEc2Topic"},
 		      "privateSubnetId": {"Ref" : "privateSubnetId"},
 		    	"jenkinsSecurityGroup": {"Ref" : "jenkinsSecurityGroup"},
 					"jenkinsInstanceProfile": {"Ref" : "jenkinsInstanceProfile"},
-					"bucketResources": {"Ref" : "bucketResources"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
           "architecture": { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "instanceTypeJenkins" }, "Arch" ] },
           "latestAmiFunctionArn": { "Ref" : "latestAmiFunctionArn" }
 	      },
-	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/private-instances-jenkins.json"]]}
+	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/private-instances-jenkins.json"]]}
 		  }
 		},
 
@@ -366,16 +366,16 @@
 					"tagKeepAlive": {"Ref" : "tagKeepAlive"},
 					"tagOwner": {"Ref" : "tagOwner"},
 					"instanceTypeNagios": {"Ref" : "instanceTypeNagios"},
-		      "keyName": {"Ref" : "keyName"},
+		      "ec2KeyPair": {"Ref" : "ec2KeyPair"},
 		      "snsEc2Topic": {"Ref" : "snsEc2Topic"},
 		      "privateSubnetId": {"Ref" : "privateSubnetId"},
 		    	"nagiosSecurityGroup": {"Ref" : "nagiosSecurityGroup"},
 					"nagiosInstanceProfile": {"Ref" : "nagiosInstanceProfile"},
-					"bucketResources": {"Ref" : "bucketResources"},
+					"bucketNameResources": {"Ref" : "bucketNameResources"},
           "architecture": { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "instanceTypeNagios" }, "Arch" ] },
           "latestAmiFunctionArn": { "Ref" : "latestAmiFunctionArn" }
 	      },
-	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketCfTemplates"}, "/vpc/private-instances-nagios.json"]]}
+	      "TemplateURL" : {"Fn::Join":["",["https://s3.amazonaws.com/", {"Ref": "bucketNameCfTemplates"}, "/vpc/private-instances-nagios.json"]]}
 		  }
 		}
   },

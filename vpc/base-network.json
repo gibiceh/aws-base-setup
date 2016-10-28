@@ -32,7 +32,7 @@
 			"Type": "String",
 			"Description":"tag - stack name"
 		},
-		"vpcCidr":{
+		"cidrVpc":{
 			"Description" : "The CIDR block of the VPC",
 			"Type" : "String"
 		},
@@ -117,7 +117,7 @@
 		"vpc":{
 			"Type" : "AWS::EC2::VPC",
    		"Properties" : {
-		  	"CidrBlock" : { "Ref" : "vpcCidr" },
+		  	"CidrBlock" : { "Ref" : "cidrVpc" },
 		  	"EnableDnsSupport" : "true",
 		  	"EnableDnsHostnames" : "true",
       	"Tags":[

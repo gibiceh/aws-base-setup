@@ -30,7 +30,7 @@
 			"Type": "String",
 			"Description":"tag - product owner"
 		},
-		"vpcCidr":{
+		"cidrVpc":{
 	   	"Description" : "The CIDR block of the VPC.",
 	  	"Type": "String"
 	  },

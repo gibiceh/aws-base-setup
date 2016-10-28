@@ -34,7 +34,7 @@
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-    "bucketResources" : {
+    "bucketNameResources" : {
       "Description" : "The name of the bucket that contains your packaged source",
       "Type" : "String"
     },
@@ -73,7 +73,7 @@
       "Properties": {
         "FunctionName" : { "Fn::Join" : [ "-", [{ "Ref": "tagEnvironment" },{ "Ref": "tagProject" },"funcLatestAmazonAmiLookup"] ] },
         "Code": {
-          "S3Bucket": { "Ref": "bucketResources" },
+          "S3Bucket": { "Ref": "bucketNameResources" },
           "S3Key": { "Ref": "s3Key" }
         },
         "Handler": { "Fn::Join" : [ "", [{ "Ref": "moduleName" },".handler"] ] },

@@ -26,7 +26,7 @@
 	  	"Description" : "Security Group for the rd gateway in public subnet",
 	  	"Type":"AWS::EC2::SecurityGroup::Id"
 	  },
-		"sshSourceIp":{
+		"cidrSshSource":{
 			"Type": "String",
 			"Description":"Monsanto IP cidr range"
 		}
@@ -129,7 +129,7 @@
 		"elbHttpsIngressFromMonsanto":{
 			"Type":"AWS::EC2::SecurityGroupIngress",
 			"Properties":{
-				"CidrIp" : {"Ref" : "sshSourceIp"},
+				"CidrIp" : {"Ref" : "cidrSshSource"},
 				"FromPort" : "443",
 				"GroupId" : {"Ref":"elbUtilityVpcSecurityGroup"},
 				"IpProtocol" : "6",

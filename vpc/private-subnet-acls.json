@@ -38,15 +38,15 @@
 	  	"Type":"AWS::EC2::Subnet::Id",
 	  	"Description":"The ID of the private subnet B."
 	  },
-		"vpcCidr":{
+		"cidrVpc":{
 	   	"Description" : "The CIDR block of the VPC.",
 	  	"Type": "String"
 	  },
-	  "publicSubnetCidr":{
+	  "cidrPublicSubnet":{
 	   	"Description" : "The CIDR block of the public subnet.",
 	  	"Type": "String"
 	  },
-		"privateSubnetCidr":{
+		"cidrPrivateSubnet":{
 	   	"Description" : "The CIDR block of the primary private subnet.",
 	  	"Type": "String"
 	  }
@@ -96,7 +96,7 @@
 		    "Protocol" : "6",
 		    "RuleAction" : "allow",
 		    "Egress" : "false",
-		    "CidrBlock" : {"Ref" : "publicSubnetCidr"},
+		    "CidrBlock" : {"Ref" : "cidrPublicSubnet"},
 		    "PortRange" : { "From" : "22", "To" : "22" }
 		  },
 		  "Metadata":{
@@ -127,7 +127,7 @@
 		    "Protocol" : "6",
 		    "RuleAction" : "allow",
 		    "Egress" : "true",
-		    "CidrBlock" : {"Ref" : "publicSubnetCidr"},
+		    "CidrBlock" : {"Ref" : "cidrPublicSubnet"},
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
 		  },
 		  "Metadata":{

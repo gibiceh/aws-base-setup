@@ -36,7 +36,7 @@
       "Description" : "Billing alarm threshold in US dollars",
       "Type" : "String"
     },
-    "bucketCloudTrail": {
+    "bucketNameCloudTrail": {
       "Description": "Name for the bucket to contain cloudtrail logs",
       "Type": "String"
     },
@@ -54,7 +54,7 @@
       },
       "DeletionPolicy": "Retain",
       "Properties": {
-        "BucketName" : {"Ref" : "bucketCloudTrail"},
+        "BucketName" : {"Ref" : "bucketNameCloudTrail"},
         "Tags":[
           {
             "Key":"cost-center",
@@ -94,7 +94,7 @@
         "Comment": "Bucket policy that allows cloudtrail to write to the cloudtrail s3 bucket"
       },
       "Properties": {
-        "Bucket": {"Ref": "bucketCloudTrail"},
+        "Bucket": {"Ref": "bucketNameCloudTrail"},
         "PolicyDocument": {
           "Statement": [
             {
@@ -113,7 +113,7 @@
                         "",
                         [
                           {
-                            "Ref": "bucketCloudTrail"
+                            "Ref": "bucketNameCloudTrail"
                           }
                         ]
                       ]
@@ -139,7 +139,7 @@
                           "",
                           [
                             {
-                              "Ref": "bucketCloudTrail"
+                              "Ref": "bucketNameCloudTrail"
                             }
                           ]
                         ]
@@ -166,7 +166,7 @@
         "IncludeGlobalServiceEvents": true,
         "IsLogging": true,
         "S3BucketName": {
-          "Ref": "bucketCloudTrail"
+          "Ref": "bucketNameCloudTrail"
         },
         "Tags":[
           {
@@ -199,7 +199,7 @@
           }
         ]
       },
-      "DependsOn" : "cloudTrailBucket"
+      "DependsOn" : "bucketCloudTrail"
     },
 
     "alarmSpending": {

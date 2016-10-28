@@ -66,7 +66,7 @@
 	  	"Type":"String",
 	  	"Description":"The ID of the public route table the public subnet is associated with."
 	  },
-		"bucketResources":{
+		"bucketNameResources":{
 			"Type":"String",
 			"Description": "The name of the S3 bucket that holds resource files for conductor"
 		}

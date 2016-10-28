@@ -27,8 +27,13 @@ Utilize bash scripts in combination with the awscli to create cloudformation sta
   * The user has the ability to prevent resource creation by adding the follow condition to the resource block which should not be created
   * "Condition" : "doNotCreateStack"
 
+# settings.sh
+* Configure the resources that make up the cloudformation stack
+* Checks to make sure all settings.sh parameters have been configured that are required
+
 
 # Usage
 1. settings.sh
   * copy from settings.sh.example to settings.sh
   * populate <CHANGE_ME> where seen
+2. bash setup-environment.sh [ prelim | vpc | all | update_resources_bucket | ... ]

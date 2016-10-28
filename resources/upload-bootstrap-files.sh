@@ -31,8 +31,10 @@ function main() {
 
   aws --profile $settings_aws_cli_profile \
     s3 sync $CURRENT_DIR s3://$settings_prelim_s3repos_resources_bucketname \
-    --exclude "upload-bootstrap-files.sh" \
     --exclude "amilookup/*" \
+    --exclude "documentation/*" \
+    --exclude "sed-monsanto-tags.sh" \
+    --exclude "upload-bootstrap-files.sh" \
     --delete \
     || { echo "Could not upload resource files to s3://$settings_prelim_s3repos_resources_bucketname. Does the bucket exist?"; exit 1;}
 }
