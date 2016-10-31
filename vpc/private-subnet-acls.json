@@ -1,95 +1,108 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-	"Description" : "Creates all required route table and ACLs for the private subnet.",
+	"Description" : "Provision all required ACL entries for the private subnet.",
 	"Parameters" : {
-		"tagStack":{
+		"tagCostCenter":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "tagEnvironment":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "tagGroup":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "tagKeepAlive":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "tagOwner":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "tagProject":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-	  "tagProject":{
-	    "Type": "String",
-	    "Description":"tag - project name"
-	  },
-	  "tagGroup":{
-	    "Type": "String",
-	    "Description":"tag - group name"
-	  },
-	  "tagCostCenter":{
-	    "Type": "String",
-	    "Description":"tag - cost center"
-	  },
-		"tagEnvironment":{
-	    "Type": "String",
-	    "Description":"tag - environment"
-	  },
-	  "tagKeepAlive":{
-	    "Type": "String",
-	    "Description":"tag - keep alive tag"
-	  },
-	  "tagOwner":{
-	    "Type": "String",
-	    "Description":"tag - product owner"
-	  },
-		"vpcId":{
-	    "Type":"AWS::EC2::VPC::Id",
-	    "Description":"The ID of the VPC the subnets shall be provisioned in."
-	  },
-	  "privateSubnetId":{
-	  	"Type":"AWS::EC2::Subnet::Id",
-	  	"Description":"The ID of the private subnet B."
-	  },
-		"cidrVpc":{
-	   	"Description" : "The CIDR block of the VPC.",
+		"cidrPrivateSubnet":{
+	   	"Description" : "The CIDR block of the primary private subnet.",
 	  	"Type": "String"
 	  },
 	  "cidrPublicSubnet":{
 	   	"Description" : "The CIDR block of the public subnet.",
 	  	"Type": "String"
 	  },
-		"cidrPrivateSubnet":{
-	   	"Description" : "The CIDR block of the primary private subnet.",
+		"cidrVpc":{
+	   	"Description" : "The CIDR block of the VPC.",
 	  	"Type": "String"
+	  },
+		"privateSubnetId":{
+	  	"Type":"AWS::EC2::Subnet::Id",
+	  	"Description":"The ID of the private subnet B."
+	  },
+		"vpcId":{
+	    "Type":"AWS::EC2::VPC::Id",
+	    "Description":"The ID of the VPC the subnets shall be provisioned in."
 	  }
 	},
 	"Mappings":{},
 	"Resources" : {
 		"privateSubnetAcl" : {
     	"Type" : "AWS::EC2::NetworkAcl",
+			"Metadata":{
+	    	"Comment" : "ACL for the private subnet. Allow bidirectional traffic from the public subnet."
+	    },
 	  	"Properties" : {
-		  	"Tags" : [{
-		    	"Key":"stack",
-		    	"Value": {"Ref": "tagStack"}
-		    	},{
-		    	"Key":"Name",
-		    	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"privateSubnetAcl"]]}
-		      },{
-					"Key":"project",
-		    	"Value":{"Ref": "tagProject"}
-					},{
-					"Key":"group",
-		    	"Value":{"Ref": "tagGroup"}
-					},{
-					"Key":"cost-center",
-		    	"Value":{"Ref": "tagCostCenter"}
-					},{
-					"Key":"environment",
-					"Value":{"Ref": "tagEnvironment"}
-					},{
-					"Key":"keep-alive",
-					"Value":{"Ref": "tagKeepAlive"}
-					},{
-					"Key":"owner",
-					"Value":{"Ref": "tagOwner"}
-					}
+				"Tags": [
+					{
+            "Key":"mon:cost-center",
+            "Value":{"Ref": "tagCostCenter"}
+          },
+          {
+            "Key":"mon:environment",
+            "Value":{"Ref": "tagEnvironment"}
+	        },
+          {
+            "Key":"mon:group",
+            "Value":{"Ref": "tagGroup"}
+          },
+          {
+		        "Key":"mon:keep-alive",
+		        "Value":{"Ref": "tagKeepAlive"}
+		      },
+					{
+		      	"Key":"Name",
+		      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"privateSubnetAcl"]]}
+	        },
+          {
+		        "Key":"mon:owner",
+		        "Value":{"Ref": "tagOwner"}
+		      },
+          {
+            "Key":"mon:project",
+            "Value":{"Ref": "tagProject"}
+          },
+          {
+            "Key":"stack",
+            "Value": {"Ref": "tagStack"}
+          }
 				],
 	    	"VpcId" : {"Ref" : "vpcId"}
-	  	},
-	    "Metadata":{
-	    	"Comment" : "ACL for the private subnet. Allow bidirectional traffic from the public subnet."
-	    }
+	  	}
 	  },
-		"privateSubnetAllowInboundSshFromPublicSubnet" : {
+		"privateSubnetAllowSshIngressFromPublicSubnet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allow inbound ssh requests to the private subnet originating from the public subnet."
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "privateSubnetAcl" },
 		    "RuleNumber" : "100",
@@ -98,13 +111,14 @@
 		    "Egress" : "false",
 		    "CidrBlock" : {"Ref" : "cidrPublicSubnet"},
 		    "PortRange" : { "From" : "22", "To" : "22" }
-		  },
-		  "Metadata":{
-		    "Comment" : "allow inbound ssh requests originating in the public subnet."
 		  }
 		},
-		"privateSubnetAllowInboundResponsesFromInternet" : {
+		"privateSubnetAllowResponsesIngressFromInternet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allow for responses from internet (including S3).",
+				"Comment2" : "Requires NAT Gateway to be implemented in the public subnet."
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "privateSubnetAcl" },
 		    "RuleNumber" : "110",
@@ -113,14 +127,14 @@
 		    "Egress" : "false",
 		    "CidrBlock" : "0.0.0.0/0",
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
-		  },
-		  "Metadata":{
-		    "Comment" : "Used to allow for responses from internet (including S3)"
 		  }
 		},
 
-		"privateSubnetAllowOutboundResponsesToPublicSubnet" : {
+		"privateSubnetAllowResponsesEgressToPublicSubnet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allows outbound responses to public subnet from private subnet."
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "privateSubnetAcl" },
 		    "RuleNumber" : "100",
@@ -129,18 +143,19 @@
 		    "Egress" : "true",
 		    "CidrBlock" : {"Ref" : "cidrPublicSubnet"},
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
-		  },
-		  "Metadata":{
-		    "Comment" : "Allows outbound responses to public subnet"
 		  }
 		},
 
 	  "privateSubnetAclAssociation" : {
 			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Metadata":{
+				"Comment": "Assocate above defined subnel ACLs with the private subnet."
+			},
 			"Properties" : {
 				"SubnetId" : { "Ref" : "privateSubnetId" },
 				"NetworkAclId" : { "Ref" : "privateSubnetAcl" }
-			}
+			},
+			"DependsOn":"privateSubnetAcl"
 		}
 	},
 	"Outputs" : {}

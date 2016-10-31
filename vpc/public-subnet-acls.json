@@ -1,42 +1,36 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-	"Description" : "Creates all required ACLs for the public subnet.",
+	"Description" : "Provision all required ACL entries for the public subnet.",
 	"Parameters" : {
-		"tagStack":{
+		"tagCostCenter":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "tagEnvironment":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "tagGroup":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "tagKeepAlive":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "tagOwner":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "tagProject":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
-	  },
-		"tagProject":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"tagGroup":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"tagCostCenter":{
-			"Type": "String",
-			"Description":"tag - stack name"
-		},
-		"tagEnvironment":{
-			"Type": "String",
-			"Description":"tag - environment"
-		},
-		"tagKeepAlive":{
-			"Type": "String",
-			"Description":"tag - keep alive tag"
-		},
-		"tagOwner":{
-			"Type": "String",
-			"Description":"tag - product owner"
-		},
-		"vpcId":{
-	    "Type":"AWS::EC2::VPC::Id",
-	    "Description":"The ID of the VPC the subnets shall be provisioned in."
-	  },
-	  "publicSubnetId":{
-	  	"Type":"AWS::EC2::Subnet::Id",
-	  	"Description":"The ID of the public subnet."
 	  },
 		"cidrPrivateSubnet":{
 	   	"Description" : "The CIDR block of the primary private subnet.",
@@ -45,48 +39,66 @@
 		"cidrSshSource":{
 			"Type":"String",
 			"Description": "ip address to allow ssh access from"
-		}
+		},
+		"publicSubnetId":{
+	  	"Type":"AWS::EC2::Subnet::Id",
+	  	"Description":"The ID of the public subnet."
+	  },
+		"vpcId":{
+	    "Type":"AWS::EC2::VPC::Id",
+	    "Description":"The ID of the VPC the subnets shall be provisioned in."
+	  }
 	},
 	"Mappings":{},
 	"Resources" : {
 		"publicSubnetAcl" : {
       "Type" : "AWS::EC2::NetworkAcl",
+			"Metadata":{
+	    	"Comment":"ACL for the public subnet."
+	    },
 	    "Properties" : {
-	    	"Tags" : [{
-	      	"Key":"stack",
-	      	"Value": {"Ref": "tagStack"}
-	      	},{
-	      	"Key":"Name",
-	      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicSubnetAcl"]]}
-	        },{
-					"Key":"project",
-	      	"Value":{"Ref": "tagProject"}
-					},{
-					"Key":"group",
-	        "Value":{"Ref": "tagGroup"}
-					},{
-					"Key":"cost-center",
-	        "Value":{"Ref": "tagCostCenter"}
-					},{
-					"Key":"environment",
-					"Value":{"Ref": "tagEnvironment"}
-					},{
-					"Key":"keep-alive",
-					"Value":{"Ref": "tagKeepAlive"}
-					},{
-					"Key":"owner",
-					"Value":{"Ref": "tagOwner"}
-					}
+				"Tags": [
+					{
+            "Key":"mon:cost-center",
+            "Value":{"Ref": "tagCostCenter"}
+          },
+          {
+            "Key":"mon:environment",
+            "Value":{"Ref": "tagEnvironment"}
+	        },
+          {
+            "Key":"mon:group",
+            "Value":{"Ref": "tagGroup"}
+          },
+          {
+		        "Key":"mon:keep-alive",
+		        "Value":{"Ref": "tagKeepAlive"}
+		      },
+					{
+		      	"Key":"Name",
+		      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicSubnetAcl"]]}
+	        },
+          {
+		        "Key":"mon:owner",
+		        "Value":{"Ref": "tagOwner"}
+		      },
+          {
+            "Key":"mon:project",
+            "Value":{"Ref": "tagProject"}
+          },
+          {
+            "Key":"stack",
+            "Value": {"Ref": "tagStack"}
+          }
 				],
 	      "VpcId" : {"Ref" : "vpcId"}
-	  	},
-	  	"Metadata":{
-	    	"Comment":"ACL for the public subnet."
-	    }
+	  	}
 		},
-
-		"publicSubnetAllowInboundResponsesFromInternet" : {
+		"publicSubnetAllowResponsesIngressFromInternet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allow inbound responses to requests originating in the subnet.  Limit to linux kernel port range."
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 		    "RuleNumber" : "110",
@@ -95,13 +107,13 @@
 		  	"Egress" : "false",
 		    "CidrBlock" : "0.0.0.0/0",
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
-		  },
-		  "Metadata":{
-		    "Comment" : "allow inbound responses to requests originating in the subnet.  Limit to linux kernel port range and ip can be narrowed down (ITSA IP, S3, etc)"
 		  }
 		},
-		"publicSubnetAllowSshInboundFromSpecificIp" : {
+		"publicSubnetAllowSshIngressFromCidrSshSource" : {
 			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+	    	"Comment" : "Allow inbound ssh from ip address range assigned to cidrSshSource"
+	    },
 			"Properties" : {
 				"NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 				"RuleNumber" : "120",
@@ -110,14 +122,14 @@
 				"Egress" : "false",
 				"CidrBlock" : {"Ref": "cidrSshSource"},
 				"PortRange" : { "From" : "22", "To" : "22" }
-			},
-	    "Metadata":{
-	    	"Comment" : "allow inbound ssh from ip address assigned to cidrSshSource"
-	    }
+			}
 	  },
 
-		"publicSubnetAllowOutboundResponsesToSpecificIp" : {
+		"publicSubnetAllowResponsesEgressToCidrSshSource" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allows outbound ssh responses to ip address range assigned to cidrSshSource"
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 		    "RuleNumber" : "100",
@@ -126,13 +138,14 @@
 		    "Egress" : "true",
 		    "CidrBlock" : {"Ref": "cidrSshSource"},
 		    "PortRange" : { "From" : "1024", "To" : "65535" }
-		  },
-		  "Metadata":{
-		    "Comment" : "Allows outbound ssh responses to ip address assigned to cidrSshSource"
 		  }
 		},
-		"publicSubnetAllowOutboundHttpToInternet" : {
+		"publicSubnetAllowHttpEgressToInternet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allows outbound http traffic to the Internet (ex: for uploads)",
+				"Comment2": "Allows traffic to private subnet coming through public subnet ELB (ELB may not exist)."
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 		    "RuleNumber" : "110",
@@ -141,13 +154,13 @@
 		    "Egress" : "true",
 		    "CidrBlock" : "0.0.0.0/0",
 		    "PortRange" : { "From" : "80", "To" : "80" }
-		  },
-		  "Metadata":{
-		    "Comment" : "Allows outbound http traffic to the Internet for uploads and traffic to private subnet coming through ELB"
 		  }
 		},
-		"publicSubnetAllowOutboundHttpsToInternet" : {
+		"publicSubnetAllowHttpsEgressToInternet" : {
 		  "Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+		    "Comment" : "Allows outbound https traffic to the Internet"
+		  },
 		  "Properties" : {
 		    "NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 		    "RuleNumber" : "120",
@@ -156,13 +169,13 @@
 		    "Egress" : "true",
 		    "CidrBlock" : "0.0.0.0/0",
 		    "PortRange" : { "From" : "443", "To" : "443" }
-		  },
-		  "Metadata":{
-		    "Comment" : "Allows outbound https traffic to the Internet"
 		  }
 		},
-		"publicSubnetAllowOutboundSshToPrivateSubnet" : {
+		"publicSubnetAllowSshEgressToPrivateSubnet" : {
 			"Type" : "AWS::EC2::NetworkAclEntry",
+			"Metadata":{
+				"Comment" : "Allows outbound ssh traffic to the private subnet."
+			},
 			"Properties" : {
 				"NetworkAclId" : { "Ref" : "publicSubnetAcl" },
 				"RuleNumber" : "130",
@@ -171,14 +184,14 @@
 				"Egress" : "true",
 				"CidrBlock" : {"Ref" : "cidrPrivateSubnet"},
 				"PortRange" : { "From" : "22", "To" : "22" }
-			},
-			"Metadata":{
-				"Comment" : "Allows outbound ssh traffic to the private subnet"
 			}
 	  },
 
 		"publicSubnetNetworkAclAssociation" : {
 			"Type" : "AWS::EC2::SubnetNetworkAclAssociation",
+			"Metadata":{
+				"Comment": "Assocate above defined subnel ACLs with the public subnet."
+			},
 			"Properties" : {
 				"SubnetId" : { "Ref" : "publicSubnetId" },
 				"NetworkAclId" : { "Ref" : "publicSubnetAcl" }

@@ -1,64 +1,42 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-<<<<<<< HEAD
-	"Description" : "Creates the VPC endpoints for EC2 to S3 $ENV-pim-resources access",
-=======
-	"Description" : "Creates the VPC endpoints for EC2 to s3://$settings_environment-$settings_project-resources access and package repository calls from amazon linux",
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+	"Description" : "Creates the VPC endpoints for EC2 to s3://$settings_environment-$settings_project-resources access and Amazon Linxu package repository requests.",
 	"Parameters" : {
-		"tagStack":{
+		"tagCostCenter":{
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "tagEnvironment":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "tagGroup":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "tagKeepAlive":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "tagOwner":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "tagProject":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
+    "tagStack":{
 	    "Type": "String",
 	    "Description":"tag - stack name"
 	  },
-	  "tagProject":{
-	    "Type": "String",
-<<<<<<< HEAD
-	    "Description":"tag - project name"
-	  },
-	  "tagGroup":{
-	    "Type": "String",
-	    "Description":"tag - group name"
-	  },
-	  "tagCostCenter":{
-	    "Type": "String",
-	    "Description":"tag - cost center"
-	  },
-		"tagEnvironment":{
-	    "Type": "String",
-	    "Description":"tag - environment"
-	  },
-	  "tagKeepAlive":{
-	    "Type": "String",
-	    "Description":"tag - keep alive tag"
-	  },
-	  "tagOwner":{
-	    "Type": "String",
-	    "Description":"tag - product owner"
-=======
-	    "Description":"Tag - Project name"
-	  },
-	  "tagGroup":{
-	    "Type": "String",
-	    "Description":"Tag - Group name"
-	  },
-		"tagEnvironment":{
-	    "Type": "String",
-	    "Description":"environment tag"
-	  },
-	  "tagKeepAlive":{
-	    "Type": "String",
-	    "Description":"Tag - Keep Alive tag"
-	  },
-	  "tagOwner":{
-	    "Type": "String",
-	    "Description":"Tag - product owner"
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
-	  },
-    "vpcId":{
-	  	"Type":"AWS::EC2::VPC::Id",
-	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
-	  },
-    "internalRouteTableId":{
+		"bucketNameResources":{
+			"Type":"String",
+			"Description": "The name of the S3 bucket that holds resource files for conductor"
+		},
+		"internalRouteTableId":{
 	  	"Type":"String",
 	  	"Description":"The ID of the internal route table the private subnet is associated with."
 	  },
@@ -66,19 +44,18 @@
 	  	"Type":"String",
 	  	"Description":"The ID of the public route table the public subnet is associated with."
 	  },
-		"bucketNameResources":{
-			"Type":"String",
-			"Description": "The name of the S3 bucket that holds resource files for conductor"
-		}
+    "vpcId":{
+	  	"Type":"AWS::EC2::VPC::Id",
+	  	"Description":"The ID of the VPC the subnets shall be provisioned in."
+	  }
   },
 
 	"Resources" : {
-<<<<<<< HEAD
-    "s3EndPoint" : {
-=======
-    "s3Endpoint" : {
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
+    "vpcEndpointS3" : {
       "Type" : "AWS::EC2::VPCEndpoint",
+			"Metadata":{
+        "Comment" : "Resource is s3:::* due to yum calls on amazon linux pulling resources from a s3 resource."
+      },
       "Properties" : {
   			"PolicyDocument" : {
           "Version":"2012-10-17",
@@ -96,16 +73,10 @@
         "RouteTableIds" : [ {"Ref" : "internalRouteTableId"}, {"Ref" : "publicRouteTableId"}],
         "ServiceName" : { "Fn::Join": [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ] },
         "VpcId" : {"Ref" : "vpcId"}
-      },
-      "Metadata":{
-<<<<<<< HEAD
-        "Comment" : "Resource is s3:::* due to yum calls on amazon linux pulling resources from a s3 bucket"
-=======
-        "Comment" : "Resource is s3:::* due to yum calls on amazon linux pulling resources from a s3 resource"
->>>>>>> 9b7d460039404db119ef7086991afccd58f2ce73
       }
     }
 	},
+
 	"Outputs" : {
 	}
 }

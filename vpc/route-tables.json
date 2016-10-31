@@ -1,58 +1,56 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
-	"Description" : "Creates all route tables for the Conductor infrastructure and associates them with the appropriate subnets.",
+	"Description" : "Provision all route tables for the system and associates them with the appropriate subnets.",
 	"Parameters" : {
-		"tagStack":{
-			"Type": "String",
-			"Description":"tag - stack name"
-	  },
-		"tagProject":{
-			"Type": "String",
-			"Description":"tag - project name"
-		},
-		"tagGroup":{
-			"Type": "String",
-			"Description":"tag - group name"
-		},
 		"tagCostCenter":{
-			"Type": "String",
-			"Description":"tag - cost center"
-		},
-		"tagEnvironment":{
-			"Type": "String",
-			"Description":"tag - environment"
-		},
-		"tagKeepAlive":{
-			"Type": "String",
-			"Description":"tag - keep alive tag"
-		},
-		"tagOwner":{
-			"Type": "String",
-			"Description":"tag - product owner"
-		},
+      "Type": "String",
+      "Description":"tag - cost center"
+    },
+    "tagEnvironment":{
+      "Type": "String",
+      "Description":"tag - environment",
+      "AllowedValues" : ["sb", "test", "dev", "mergeddev", "qa", "prod"]
+    },
+    "tagGroup":{
+      "Type": "String",
+      "Description":"tag - group name"
+    },
+    "tagKeepAlive":{
+      "Type": "String",
+      "Description":"tag - keep alive tag",
+      "AllowedValues" : ["true", "false"]
+    },
+    "tagOwner":{
+      "Type": "String",
+      "Description":"tag - product owner"
+    },
+    "tagProject":{
+      "Type": "String",
+      "Description":"tag - project name"
+    },
+    "tagStack":{
+	    "Type": "String",
+	    "Description":"tag - stack name"
+	  },
 		"cidrVpc":{
 	   	"Description" : "The CIDR block of the VPC.",
 	  	"Type": "String"
 	  },
-		"vpcId":{
-	    "Type":"AWS::EC2::VPC::Id",
-	    "Description":"The ID of the VPC the subnets shall be provisioned in."
-	  },
-	  "publicSubnetId":{
-	  	"Type":"AWS::EC2::Subnet::Id",
-	    "Description":"The ID of the public subnet."
+		"internetGatewayId":{
+	  	"Type":"String",
+	  	"Description":"The ID of the Internet Gateway."
 	  },
 		"privateSubnetId":{
 	  	"Type":"AWS::EC2::Subnet::Id",
 	  	"Description":"The ID of the private subnet."
 	  },
-	  "internetGatewayId":{
-	  	"Type":"String",
-	  	"Description":"The ID of the Internet Gateway."
+	  "publicSubnetId":{
+	  	"Type":"AWS::EC2::Subnet::Id",
+	    "Description":"The ID of the public subnet."
 	  },
-		"natGatewayId":{
-	  	"Type":"String",
-	  	"Description":"The ID of the Managed NAT Gateway."
+		"vpcId":{
+	    "Type":"AWS::EC2::VPC::Id",
+	    "Description":"The ID of the VPC the subnets shall be provisioned in."
 	  },
 		"doNotCreate" : {
 			"Description" : "If doNotCreateStack condition is present (\"Condition\" : \"doNotCreateStack\") in resource definition, then the resource is not created",
@@ -62,54 +60,64 @@
 
 	},
 	"Mappings":{},
+
 	"Conditions" : {
     "doNotCreateStack" : {"Fn::Equals" : [{"Ref" : "doNotCreate"}, "false"]}
   },
+
 	"Resources" : {
 		"publicRouteTable": {
 			"Type": "AWS::EC2::RouteTable",
+			"Metadata" :{
+				"Comment" : "Provision route table to control the flow between the public Internet and the VPC."
+			},
 			"Properties": {
 				"VpcId": {"Ref" : "vpcId"},
-				"Tags": [{
-					"Key":"stack",
-					"Value": {"Ref": "tagStack"}
-					},{
-	        "Key":"Name",
-	        "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicRouteTable"]]}
-	        },{
-					"Key":"project",
-	        "Value":{"Ref": "tagProject"}
-					},{
-					"Key":"group",
-	        "Value":{"Ref": "tagGroup"}
-					},{
-					"Key":"cost-center",
-	      	"Value":{"Ref": "tagCostCenter"}
-					},{
-					"Key":"environment",
-					"Value":{"Ref": "tagEnvironment"}
-					},{
-					"Key":"keep-alive",
-					"Value":{"Ref": "tagKeepAlive"}
-					},{
-					"Key":"owner",
-					"Value":{"Ref": "tagOwner"}
-					}
+				"Tags": [
+					{
+            "Key":"mon:cost-center",
+            "Value":{"Ref": "tagCostCenter"}
+          },
+          {
+            "Key":"mon:environment",
+            "Value":{"Ref": "tagEnvironment"}
+	        },
+          {
+            "Key":"mon:group",
+            "Value":{"Ref": "tagGroup"}
+          },
+          {
+		        "Key":"mon:keep-alive",
+		        "Value":{"Ref": "tagKeepAlive"}
+		      },
+					{
+		      	"Key":"Name",
+		      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"publicRouteTable"]]}
+	        },
+          {
+		        "Key":"mon:owner",
+		        "Value":{"Ref": "tagOwner"}
+		      },
+          {
+            "Key":"mon:project",
+            "Value":{"Ref": "tagProject"}
+          },
+          {
+            "Key":"stack",
+            "Value": {"Ref": "tagStack"}
+          }
 				]
-			},
-			"Metadata" :{
-				"Comment" : "This is the route table to control the flow between the public Internet and the VPC."
 			}
 		},
-		"publicInternetTrafficRoute": {
+		"publicRouteInternetTraffic": {
 			"Type": "AWS::EC2::Route",
+			"Metadata" :{
+				"Comment" : "Provision route to internet from VPC"
+			},
 			"Properties": {
 				"RouteTableId": {"Ref" : "publicRouteTable"},
 				"DestinationCidrBlock": "0.0.0.0/0",
 				"GatewayId": {"Ref" : "internetGatewayId"}
-			},
-			"Metadata" :{
-				"Comment" : "route to internet from VPC"
 			},
 			"DependsOn":"publicRouteTable"
 		},
@@ -119,58 +127,66 @@
 				"SubnetId": {"Ref" : "publicSubnetId"},
 				"RouteTableId": {"Ref" : "publicRouteTable"}
 			},
-			"DependsOn":["publicInternetTrafficRoute"]
+			"DependsOn":["publicRouteInternetTraffic"]
 		},
 
 		"internalRouteTable": {
 			"Type": "AWS::EC2::RouteTable",
+			"Metadata" :{
+				"Comment" : "Provision the route table to controls internal only traffic."
+			},
 			"Properties": {
 				"VpcId": {"Ref" : "vpcId"},
-				"Tags": [{
-					"Key":"stack",
-					"Value": {"Ref": "tagStack"}
-					},{
-	        "Key":"Name",
-	        "Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"internalRouteTable"]]}
-	        },{
-					"Key":"project",
-	        "Value":{"Ref": "tagProject"}
-					},{
-					"Key":"group",
-	        "Value":{"Ref": "tagGroup"}
-					},{
-					"Key":"cost-center",
-	        "Value":{"Ref": "tagCostCenter"}
-					},{
-					"Key":"environment",
-					"Value":{"Ref": "tagEnvironment"}
-					},{
-					"Key":"keep-alive",
-					"Value":{"Ref": "tagKeepAlive"}
-					},{
-					"Key":"owner",
-					"Value":{"Ref": "tagOwner"}
-					}
+				"Tags": [
+					{
+            "Key":"mon:cost-center",
+            "Value":{"Ref": "tagCostCenter"}
+          },
+          {
+            "Key":"mon:environment",
+            "Value":{"Ref": "tagEnvironment"}
+	        },
+          {
+            "Key":"mon:group",
+            "Value":{"Ref": "tagGroup"}
+          },
+          {
+		        "Key":"mon:keep-alive",
+		        "Value":{"Ref": "tagKeepAlive"}
+		      },
+					{
+		      	"Key":"Name",
+		      	"Value":{"Fn::Join":["-",[{"Ref": "tagStack"},"internalRouteTable"]]}
+	        },
+          {
+		        "Key":"mon:owner",
+		        "Value":{"Ref": "tagOwner"}
+		      },
+          {
+            "Key":"mon:project",
+            "Value":{"Ref": "tagProject"}
+          },
+          {
+            "Key":"stack",
+            "Value": {"Ref": "tagStack"}
+          }
 				]
-			},
-			"Metadata" :{
-				"Comment" : "This route table controls the internal only traffic."
 			}
 		},
-
-		"privateSubnetInternetTrafficRoute": {
+		"internalRouteInternetTrafficFromPrivateSubnet": {
 			"Type": "AWS::EC2::Route",
+			"Condition" : "doNotCreateStack",
+			"Metadata" :{
+				"Comment" : "Provision route to internet from private subnet through NAT gateway,",
+				"Comment2" : "Requires NAT Gateway to be implemented in the public subnet."
+			},
 			"Properties": {
 				"RouteTableId": {"Ref" : "internalRouteTable"},
 				"DestinationCidrBlock": "0.0.0.0/0",
 				"NatGatewayId": {"Ref" : "natGatewayId"}
 			},
-			"Metadata" :{
-				"Comment" : "route to internet from private subnet through NAT gateway"
-			},
 			"DependsOn":"internalRouteTable"
 		},
-
 		"internalRouteTableAssocToPrivateSubnet": {
 			"Type": "AWS::EC2::SubnetRouteTableAssociation",
 			"Properties": {
@@ -180,6 +196,7 @@
 			"DependsOn":"internalRouteTable"
 		}
 	},
+	
 	"Outputs" : {
 		"internalRouteTableId":{
 			"Description" : "The ID of the internal route table",

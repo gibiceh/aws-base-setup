@@ -152,7 +152,7 @@
     settings_vpc_private_subnet_cidr="<CHANGE_ME>" #"10.16.2.0/24"
 
   # ssh access from listed ip addresses
-    settings_vpc_ssh_source_ip_address="<CHANGE_ME>"
+    settings_vpc_ssh_source_cidr="<CHANGE_ME>"
 
   # declare AMIs to be used (this parameter is not currently passed to cloudformation)
   # currently a lambda function is provisioned by the preliminaries stack to always provide the latest Amazon Linux AMI
@@ -175,14 +175,10 @@
   settings_vpc_param9="ParameterKey=bucketNameResources,ParameterValue=$settings_prelim_s3repos_resources_bucketname"
   settings_vpc_param10="ParameterKey=cidrPrivateSubnet,ParameterValue=$settings_vpc_private_subnet_cidr"
   settings_vpc_param11="ParameterKey=cidrPublicSubnet,ParameterValue=$settings_vpc_public_subnet_cidr"
-  settings_vpc_param12="ParameterKey=cidrSshSource,ParameterValue=$settings_vpc_ssh_source_ip_address"
+  settings_vpc_param12="ParameterKey=cidrSshSource,ParameterValue=$settings_vpc_ssh_source_cidr"
   settings_vpc_param13="ParameterKey=cidrVpc,ParameterValue=$settings_vpc_cidr"
-  settings_vpc_param14="ParameterKey=ec2KeyPair,ParameterValue=$settings_ec2_key_pair"
-  settings_vpc_param15="ParameterKey=instTypeAppServer,ParameterValue=$settings_vpc_app_server_instance_type"
-  settings_vpc_param16="ParameterKey=roleNameAppServer,ParameterValue=$settings_vpc_app_server_iam_role_name"
-  settings_vpc_param17="ParameterKey=stackNamePreliminaries,ParameterValue=$settings_prelim_stack_name"
 
-  settings_vpc_params=$(printf "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s" \
+  settings_vpc_params=$(printf "%s %s %s %s %s %s %s %s %s %s %s %s %s" \
     $settings_vpc_param1 \
     $settings_vpc_param2 \
     $settings_vpc_param3 \
@@ -195,11 +191,7 @@
     $settings_vpc_param10 \
     $settings_vpc_param11 \
     $settings_vpc_param12 \
-    $settings_vpc_param13 \
-    $settings_vpc_param14 \
-    $settings_vpc_param15 \
-    $settings_vpc_param16 \
-    $settings_vpc_param17)
+    $settings_vpc_param13)
 ##########################################################################
 
 #: Default settings
