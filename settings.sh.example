@@ -154,16 +154,6 @@
   # ssh access from listed ip addresses
     settings_vpc_ssh_source_cidr="<CHANGE_ME>"
 
-  # declare AMIs to be used (this parameter is not currently passed to cloudformation)
-  # currently a lambda function is provisioned by the preliminaries stack to always provide the latest Amazon Linux AMI
-    settings_vpc_amazon_linux_ami="<CHANGE_ME>"
-
-  # EC2 instance types
-    settings_vpc_app_server_instance_type="<CHANGE_ME>" #"t2.micro"
-
-  # IAM role names
-    settings_vpc_app_server_iam_role_name="$settings_environment-$settings_project-appServer"
-
   settings_vpc_param1="ParameterKey=tagCostCenter,ParameterValue=$settings_cost_center"
   settings_vpc_param2="ParameterKey=tagEnvironment,ParameterValue=$settings_environment"
   settings_vpc_param3="ParameterKey=tagGroup,ParameterValue=$settings_group"
