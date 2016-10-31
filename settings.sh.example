@@ -58,7 +58,7 @@
     setttings_current_epoch_time=$(date +%s)
 ##########################################################################
 
-#: setup_preliminaries.sh
+#: setup-preliminaries.sh
 #:##########################################################################
 #: Define IAM password policy parameters
   settings_prelim_iam_min_pw_length="8"
@@ -139,7 +139,7 @@
       $settings_prelim_param14)
 ##########################################################################
 
-#: setup_vpc-stack.sh
+#: setup-vpc-stack.sh
 #:##########################################################################
   # Define stack settings/parameters
     settings_vpc_stack_name="$settings_environment-$settings_project-vpc"
