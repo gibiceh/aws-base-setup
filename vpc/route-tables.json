@@ -173,20 +173,6 @@
 				]
 			}
 		},
-		"internalRouteInternetTrafficFromPrivateSubnet": {
-			"Type": "AWS::EC2::Route",
-			"Condition" : "doNotCreateStack",
-			"Metadata" :{
-				"Comment" : "Provision route to internet from private subnet through NAT gateway,",
-				"Comment2" : "Requires NAT Gateway to be implemented in the public subnet."
-			},
-			"Properties": {
-				"RouteTableId": {"Ref" : "internalRouteTable"},
-				"DestinationCidrBlock": "0.0.0.0/0",
-				"NatGatewayId": {"Ref" : "natGatewayId"}
-			},
-			"DependsOn":"internalRouteTable"
-		},
 		"internalRouteTableAssocToPrivateSubnet": {
 			"Type": "AWS::EC2::SubnetRouteTableAssociation",
 			"Properties": {
@@ -196,7 +182,7 @@
 			"DependsOn":"internalRouteTable"
 		}
 	},
-	
+
 	"Outputs" : {
 		"internalRouteTableId":{
 			"Description" : "The ID of the internal route table",

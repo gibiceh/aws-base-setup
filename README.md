@@ -26,6 +26,7 @@ Utilize bash scripts in combination with the awscli to create cloudformation sta
 * Selective Resource Creation
   * The user has the ability to prevent resource creation by adding the follow condition to the resource block which should not be created
   * "Condition" : "doNotCreateStack"
+* Script logs captured and stored locally at ./logs/automation.log
 
 # settings.sh
 * Configure the resources that make up the cloudformation stack
